@@ -1,4 +1,5 @@
-import { HashRouter, Route, Routes } from 'react-router-dom'
+import { Suspense } from 'react'
+import { Route, Routes } from 'react-router-dom'
 import { routes, type AppRoute } from './routes'
 import { RouteGuard } from './RouteGuard'
 
@@ -14,14 +15,15 @@ function renderRoutes(list: AppRoute[]): React.ReactNode {
 }
 
 /**
- * Central router entry. Uses HashRouter for Electron: it works over the
- * `file://` protocol, needs no server, and survives production reloads without
- * full-page navigation issues. No UI or navigation logic lives here.
+ * Renders the route table. The `HashRouter` provider is set up in `AppRoot`
+ * (`shell/`) so it wraps the whole app shell (title bar included) — this
+ * component just declares the routes inside it. No UI/navigation logic here.
  */
 export function AppRouter(): React.JSX.Element {
   return (
-    <HashRouter>
+    // Boundary for lazy-loaded route elements; swap `null` for a loader later.
+    <Suspense fallback={null}>
       <Routes>{renderRoutes(routes)}</Routes>
-    </HashRouter>
+    </Suspense>
   )
 }

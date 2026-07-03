@@ -1,3 +1,4 @@
+import { lazy } from 'react'
 import type { ReactNode } from 'react'
 import { ROUTE_PATHS } from './routePaths'
 import App from '../App'
@@ -19,10 +20,16 @@ export interface AppRoute {
   children?: AppRoute[]
 }
 
+const Releases = lazy(() => import('@renderer/pages/Releases/Releases'))
+
 /** The application's route table. */
 export const routes: AppRoute[] = [
   {
     path: ROUTE_PATHS.ROOT,
     element: <App />
+  },
+  {
+    path: ROUTE_PATHS.RELEASES,
+    element: <Releases />
   }
 ]

@@ -6,14 +6,16 @@ Client-side routing for the renderer, built on `react-router-dom` with a
 **HashRouter** (Electron/`file://`-safe). Everything lives in
 `src/renderer/src/router` and is fully decoupled from UI:
 
-- `routePaths.ts` — centralized route string constants (`ROUTE_PATHS`)
+- `routePaths.ts` — centralized route strings (`ROUTE_PATHS`) + titles (`ROUTE_TITLES`)
 - `routes.tsx` — the declarative route table (`AppRoute[]`)
 - `RouteGuard.tsx` — pass-through wrapper for future auth/permission logic
-- `AppRouter.tsx` — the `HashRouter` entry; maps the table to `<Route>`s
+- `AppRouter.tsx` — renders the route table (`<Routes>`) inside a `<Suspense>` boundary
 - `index.ts` — barrel
 
-`AppRouter` is rendered once by `AppRoot` (`src/renderer/src/shell/`), which
-`main.tsx` mounts.
+The `HashRouter` provider lives in `AppRoot` (`src/renderer/src/shell/`) and
+wraps the whole app shell, so chrome outside the routes — like the title bar —
+can read the current route via `useLocation`. `AppRouter` renders the routes
+inside it.
 
 ---
 

@@ -1,0 +1,28 @@
+@use 'abstracts' as *;
+
+.titlebar {
+  position: relative; // anchor for the centered title
+  z-index: z(titlebar); // stack above content so the menu dropdown isn't clipped
+  display: flex;
+  align-items: center;
+  flex-shrink: 0;
+  height: $titlebar-height;
+  background-color: $surface;
+  user-select: none;
+  -webkit-app-region: drag; // whole bar drags the window
+}
+
+.drag {
+  flex: 1 1 auto;
+  height: 100%;
+}
+
+.title {
+  position: absolute;
+  left: 50%;
+  transform: translateX(-50%);
+  font-size: $font-size-xs;
+  font-weight: $font-weight-medium;
+  color: $text-secondary;
+  pointer-events: none; // never blocks dragging / double-click
+}

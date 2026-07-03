@@ -237,7 +237,7 @@ Apply directly (`box-shadow: $shadow-md;`) or via `@include elevation(md)`.
 | `$layout-max-width`     | 1280px        | Widest content container     |
 | `$layout-content-width` | 960px         | Reading-width container      |
 | `$layout-narrow-width`  | 640px         | Narrow / form container      |
-| `$titlebar-height`      | 3.2rem (32px) | Custom title bar height      |
+| `$titlebar-height`      | 2rem (20px)   | Custom title bar height      |
 | `$control-height`       | 3.8rem (38px) | Default button/input height  |
 | `$control-height-sm`    | 3rem (30px)   | Small control                |
 | `$control-height-lg`    | 4.6rem (46px) | Large control                |

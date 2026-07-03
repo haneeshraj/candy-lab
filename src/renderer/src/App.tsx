@@ -1,5 +1,7 @@
+import { Link } from 'react-router-dom'
 import Versions from './components/Versions'
 import electronLogo from './assets/electron.svg'
+import { ROUTE_PATHS } from './router/routePaths'
 import styles from './App.module.scss'
 
 function App(): React.JSX.Element {
@@ -17,14 +19,9 @@ function App(): React.JSX.Element {
         Please try pressing <code>F12</code> to open the devTool
       </p>
       <div className={styles.actions}>
-        <a
-          className={styles.action}
-          href="https://electron-vite.org/"
-          target="_blank"
-          rel="noreferrer"
-        >
-          Documentation
-        </a>
+        <Link className={styles.action} to={ROUTE_PATHS.RELEASES}>
+          Releases
+        </Link>
         <a className={styles.action} target="_blank" rel="noreferrer" onClick={ipcHandle}>
           Send IPC
         </a>

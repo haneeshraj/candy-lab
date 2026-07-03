@@ -1,0 +1,71 @@
+@use 'abstracts' as *;
+
+// Minimal boilerplate — restyle freely.
+
+.menubar {
+  display: flex;
+  height: 100%;
+  padding-left: rem(2px); // small gap before the logo
+  -webkit-app-region: no-drag; // menu must be clickable, not draggable
+}
+
+.logo {
+  display: flex;
+  align-items: center;
+  padding: 0 space(2);
+  background: transparent;
+  border: none;
+  cursor: pointer;
+
+  img {
+    display: block;
+  }
+}
+
+.menu {
+  position: relative;
+}
+
+.trigger {
+  height: 100%;
+  padding: 0 space(3);
+  font-size: $font-size-xs;
+  color: $text-secondary;
+  background: transparent;
+  border: none;
+  cursor: pointer;
+
+  &:hover {
+    color: $text-primary;
+  }
+}
+
+.dropdown {
+  position: absolute;
+  top: 100%;
+  left: 0;
+  z-index: z(dropdown);
+  min-width: rem(180px);
+  padding: space(1) 0;
+  list-style: none;
+  background-color: $surface;
+  border: $border-width solid $border;
+  border-radius: $radius-md;
+  box-shadow: $shadow-md;
+}
+
+.item {
+  display: block;
+  width: 100%;
+  padding: space(2) space(3);
+  font-size: $font-size-xs;
+  text-align: left;
+  color: $text-primary;
+  background: transparent;
+  border: none;
+  cursor: pointer;
+
+  &:hover {
+    background-color: $surface-light;
+  }
+}

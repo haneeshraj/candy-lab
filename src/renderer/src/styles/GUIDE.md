@@ -522,3 +522,82 @@ semantic token (§9).
 **Do abstracts add to my bundle size if I `@use` them everywhere?**
 No. Variables, functions, and mixins emit no CSS. Only actual style rules do,
 and Sass emits each module's CSS once.
+
+---
+
+## 18. How to add / modify
+
+Every SCSS change slots into one layer. The rule of thumb: **tokens** →
+`abstracts/`, **element defaults** → `base/`, **reusable classes** →
+`utilities/`/`layout/`, **component styles** → a co-located `*.module.scss`.
+
+### Add a design token
+
+Edit the relevant file in `abstracts/` — it's re-exported via
+`abstracts/_index.scss`, so every file that does `@use 'abstracts' as *;` gets it.
+
+```scss
+// abstracts/_variables.scss — add to the spacing scale
+$spacing: (
+  // …existing steps…
+  32: rem(128px) // ← new; also generates .m-32 / .p-32 / .gap-32
+);
+```
+
+For a **color**, follow §9 (palette → semantic pointer → per-theme value). For a
+new radius/shadow/duration, add the `$variable` next to its peers.
+
+### Add a mixin or function
+
+```scss
+// abstracts/_mixins.scss
+@mixin focus-ring($color: $primary) {
+  outline: 2px solid $color;
+  outline-offset: 2px;
+}
+```
+
+It's available everywhere via `@use 'abstracts' as *;` — no export step (the
+`_index.scss` forwards the whole file). Functions go in `_functions.scss` (keep
+them dependency-free to avoid cycles).
+
+### Add a utility class
+
+Add to the matching file in `utilities/` and reference tokens (never literals):
+
+```scss
+// utilities/_helpers.scss
+.rounded-sm {
+  border-radius: $radius-sm;
+}
+```
+
+Generated families (spacing/gap) come automatically from the `$spacing` map —
+add a scale step and the `.m-*`/`.p-*`/`.gap-*` classes appear.
+
+### Add a component style (CSS Module)
+
+Co-locate `Component.module.scss`, start with `@use 'abstracts' as *;`, use
+tokens/mixins, import as `styles` (see §6). Never import global partials into a
+component.
+
+### How to modify safely
+
+- **Change a token value:** edit it in `abstracts/` once — every consumer updates.
+  Theme-specific colors/shadows change in `themes/_dark.scss` + `_light.scss`
+  (keep both in sync).
+- **Rename a token/mixin:** Sass will error at every call site — fix them in the
+  same change.
+- **Never** hardcode a hex/px/shadow to "just tweak one spot" — add or reuse a token.
+- Update [REFERENCE.md](./REFERENCE.md) tables when you add/rename tokens.
+
+### Common mistakes
+
+- ❌ Raw hex outside `abstracts/_colors.scss` (Stylelint's `color-no-hex` blocks it).
+- ❌ Hardcoded spacing/radii/shadows — use `space()`, `$radius-*`, `$shadow-*`.
+- ❌ `!important` (only sanctioned in the reduced-motion reset).
+- ❌ Nesting deeper than 3 levels.
+- ❌ `@keyframes` inside a `*.module.scss` (CSS Modules hash the name) — put them
+  in `abstracts/_animations.scss` and reference globally.
+- ❌ `@import` — always `@use` / `@forward`.
+- ❌ Referencing the raw palette (`$palette-*`) in components — use semantic tokens.

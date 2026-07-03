@@ -180,19 +180,23 @@ typecheck — the PR must be green to merge.
 
 ---
 
-## Styling
+## System documentation
 
-The SCSS design system lives in `src/renderer/src/styles`. Before writing any
-styles, read:
+Each subsystem has its own docs, and every one includes a **“How to add /
+modify”** workflow — read the relevant guide before extending that area.
 
-- **[styles/GUIDE.md](src/renderer/src/styles/GUIDE.md)** — architecture, tokens,
-  theming, conventions, and recipes.
-- **[styles/REFERENCE.md](src/renderer/src/styles/REFERENCE.md)** — the full
-  catalog of variables, functions, mixins, and utility classes.
+| System                      | Docs                                                                                                       |
+| --------------------------- | ---------------------------------------------------------------------------------------------------------- |
+| **Styling (SCSS)**          | [styles/GUIDE.md](src/renderer/src/styles/GUIDE.md) · [REFERENCE.md](src/renderer/src/styles/REFERENCE.md) |
+| **Routing**                 | [router/README.md](src/renderer/src/router/README.md)                                                      |
+| **State (Zustand)**         | [store/GUIDE.md](src/renderer/src/store/GUIDE.md) · [REFERENCE.md](src/renderer/src/store/REFERENCE.md)    |
+| **Motion**                  | [animations/README.md](src/renderer/src/animations/README.md)                                              |
+| **Hooks**                   | [hooks/README.md](src/renderer/src/hooks/README.md)                                                        |
+| **Electron main + preload** | [main/GUIDE.md](src/main/GUIDE.md) · [REFERENCE.md](src/main/REFERENCE.md)                                 |
+| **Testing**                 | [tests/GUIDE.md](src/tests/GUIDE.md) · [REFERENCE.md](src/tests/REFERENCE.md)                              |
 
-Rule of thumb: use design tokens (`$primary`, `space(4)`, …) — never hardcode
-colors, spacing, or shadows — and keep component styles in a co-located
-`Component.module.scss`.
+Rule of thumb everywhere: use the design tokens / centralized config, never
+hardcode values, and keep component styles in a co-located `Component.module.scss`.
 
 ---
 

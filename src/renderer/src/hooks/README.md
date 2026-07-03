@@ -82,3 +82,62 @@ useIpcListener('update:progress', (percent) => setProgress(percent as number))
 - ❌ Don't put app/business logic in here — these stay generic and reusable.
 - ✔ Keep hooks pure of UI; they return state/handlers, never JSX.
 - ✔ Respect the Rules of Hooks (top-level calls only) — ESLint enforces this.
+
+## How to add / modify
+
+### Add a new hook
+
+1. **Pick the category folder** by concern: `state/`, `dom/`, `lifecycle/`, or
+   `electron/`. If none fit, create a new category folder with its own
+   `index.ts` and export it from the root `index.ts`.
+2. **Create `useX.ts`** — one hook per file, filename matches the export, with an
+   explicit return type. Memoize returned functions and clean up any listeners.
+
+   ```ts
+   // hooks/dom/useWindowSize.ts
+   import { useEffect, useState } from 'react'
+
+   export interface WindowSize {
+     width: number
+     height: number
+   }
+
+   export function useWindowSize(): WindowSize {
+     const [size, setSize] = useState<WindowSize>({
+       width: window.innerWidth,
+       height: window.innerHeight
+     })
+     useEffect(() => {
+       const onResize = (): void =>
+         setSize({ width: window.innerWidth, height: window.innerHeight })
+       window.addEventListener('resize', onResize)
+       return () => window.removeEventListener('resize', onResize)
+     }, [])
+     return size
+   }
+   ```
+
+3. **Export from the category barrel** (`hooks/dom/index.ts`):
+   ```ts
+   export * from './useWindowSize'
+   ```
+   The root `hooks/index.ts` re-exports each category, so it's available as
+   `import { useWindowSize } from '@renderer/hooks'`.
+
+### Modify an existing hook safely
+
+- **Additive changes are safe:** append optional params (with defaults) or add
+  fields to a returned object — existing callers keep working.
+- **Breaking changes** (renaming, reordering params, changing return shape):
+  update all call sites in the same change; TypeScript will flag them.
+- Keep the returned function/object references **stable** (`useCallback`/
+  `useMemo`) so consumers relying on them as effect deps don't loop.
+- Preserve cleanup — never drop a listener/timer teardown when editing.
+
+### Common mistakes
+
+- ❌ Naming a hook without the `use` prefix (breaks Rules of Hooks + lint).
+- ❌ Returning new function identities every render without `useCallback`.
+- ❌ Reading `ref.current` during render (use the state pattern — see `usePrevious`).
+- ❌ Putting feature/business logic in a generic hook.
+- ❌ Importing from a category subpath in app code — always import from `@renderer/hooks`.

@@ -125,3 +125,56 @@ The stack is ready: import `render`/`screen` from `@testing-library/react` and
 `userEvent` from `@testing-library/user-event`. jest-dom matchers are already
 set up. Keep them behavior-focused — this foundation is for logic and
 interaction, not visual/design testing.
+
+---
+
+## How to add / modify
+
+### Add a new test
+
+1. **Place it** in the folder mirroring what you're testing:
+   `src/tests/store/`, `src/tests/hooks/`, `src/tests/utils/`, etc. Create a new
+   folder if the subsystem doesn't have one.
+2. **Name it** `<subject>.test.ts` (or `.tsx` for JSX). `.spec` also matches.
+3. **Write it** — explicit `vitest` imports, app code via `@renderer/*`, reset
+   shared state in `beforeEach`:
+
+   ```ts
+   // src/tests/store/uiStore.test.ts
+   import { describe, it, expect, beforeEach } from 'vitest'
+   import { useUIStore } from '@renderer/store'
+
+   describe('useUIStore', () => {
+     beforeEach(() => useUIStore.getState().reset())
+
+     it('opens and closes a modal', () => {
+       useUIStore.getState().openModal('settings')
+       expect(useUIStore.getState().isModalOpen('settings')).toBe(true)
+       useUIStore.getState().closeModal('settings')
+       expect(useUIStore.getState().isModalOpen('settings')).toBe(false)
+     })
+   })
+   ```
+
+That's it — `vitest.config.ts`'s `include` picks up any `*.test.ts(x)` under
+`src/tests`. No registration needed.
+
+### Modify tests when logic changes
+
+- **A store/hook/util's API changed:** update the tests that import it in the
+  same change so CI stays green (a red test blocks commit + merge).
+- **Behavior intentionally changed:** update assertions to the new expected
+  values — don't delete a test to make it pass.
+- **New shared browser API a test needs:** add a minimal stub to
+  `setup/vitest.setup.ts` (like the existing `matchMedia` stub), not per-test.
+- Tests are type-checked (they're in `tsconfig.web`), so a signature change that
+  breaks a test also fails `npm run typecheck`/`build` — fix both.
+
+### Common mistakes
+
+- ❌ Relying on global `describe`/`it`/`expect` for types — import them from `vitest`.
+- ❌ Order-dependent tests — reset state in `beforeEach`; never share mutable state.
+- ❌ Testing markup/styles or asserting on class names — test behavior/state.
+- ❌ Over-mocking — only stub what jsdom genuinely lacks.
+- ❌ Adding E2E/browser-driver tests here — out of scope for this setup.
+- ❌ Deleting or skipping a failing test instead of fixing the code or the assertion.

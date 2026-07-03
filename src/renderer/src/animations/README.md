@@ -98,11 +98,85 @@ const reduced = useReducedMotionSafe()
 - ✔ **Accessibility:** gate motion behind `useReducedMotionSafe` /
   `motionSafePreset` for anything beyond a simple fade.
 
-## Extending
+## How to add / modify
 
-- **New state** → add a variant in `variants/` (states only, no timing).
-- **New timing** → add/adjust a token in `transitions/`.
-- **New UI pattern** → add a `MotionPreset` in `presets/` combining the two.
+The three layers map to three kinds of change: **variant** (a new motion
+_state_), **transition** (new timing), **preset** (a reusable UI pattern
+combining the two). The root `index.ts` re-exports every module, so anything you
+export is immediately available from `@renderer/animations`.
 
-Then export it from the relevant file — the root `index.ts` re-exports each
-module, so it's immediately available from `@renderer/animations`.
+### Add a new variant
+
+File: `animations/variants/<name>.ts`. States only (`hidden`/`visible`/`exit`),
+**no timing**, `transform`/`opacity` only.
+
+```ts
+// animations/variants/blur.ts
+import type { Variants } from 'motion/react'
+
+export const blur: Variants = {
+  hidden: { opacity: 0, filter: 'blur(4px)' },
+  visible: { opacity: 1, filter: 'blur(0px)' },
+  exit: { opacity: 0, filter: 'blur(4px)' }
+}
+```
+
+Then add `export * from './variants/blur'` to `animations/index.ts`.
+
+### Add a new transition
+
+File: `animations/transitions/<name>.ts`. Reuse the shared tokens (`duration`,
+`easeStandard`, …) from `transitions/default.ts` instead of hardcoding numbers.
+
+```ts
+// animations/transitions/gentle.ts
+import type { Transition } from 'motion/react'
+import { duration, easeOut } from './default'
+
+export const gentleTransition: Transition = {
+  duration: duration.slow,
+  ease: easeOut
+}
+```
+
+Add `export * from './transitions/gentle'` to `animations/index.ts`.
+
+### Add a new preset
+
+File: `animations/presets/<name>.ts`. Combine a variant + a transition into a
+ready-to-spread `MotionPreset`.
+
+```ts
+// animations/presets/toastAnimations.ts
+import type { MotionPreset } from '../utils/types'
+import { slideUp } from '../variants/slide'
+import { springTransition } from '../transitions/spring'
+
+export const toast: MotionPreset = {
+  variants: slideUp,
+  initial: 'hidden',
+  animate: 'visible',
+  exit: 'exit',
+  transition: springTransition
+}
+```
+
+Add `export * from './presets/toastAnimations'` to `animations/index.ts`.
+Usage: `<motion.div {...toast} />`.
+
+### Modify an existing element safely
+
+- **Variant:** keep `hidden`/`visible`/`exit` symmetric and transform/opacity-only;
+  don't add duration/easing (that belongs in a transition).
+- **Transition:** adjust the token in `transitions/default.ts` to change timing
+  app-wide, or edit the specific transition for a local change.
+- **Preset:** re-point its `variants`/`transition`; every consumer updates at once
+  — check callers if you change its behavior meaningfully.
+
+### Common mistakes
+
+- ❌ Defining variants/durations inline in a `.tsx` component — put them here.
+- ❌ Putting timing inside a variant (except `staggerChildren` orchestration).
+- ❌ Animating layout properties (`width`, `top`, `margin`) — use `x`/`y`/`scale`.
+- ❌ Hardcoding easing/duration numbers — reference the `transitions` tokens.
+- ❌ Adding `@keyframes` here — those are global CSS (see `styles/`), not motion variants.

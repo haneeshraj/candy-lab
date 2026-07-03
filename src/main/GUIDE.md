@@ -241,3 +241,93 @@ main window hidden, and swaps when it's ready.
 
 **Can I make it more locked down?** Yes — once the renderer no longer needs the
 toolkit helper, stop exposing `window.electron` and set `sandbox: true`.
+
+---
+
+## 10. How to add / modify
+
+The §7 recipes show the happy path; this is the full checklist including the
+preload side and modification rules. A new renderer-callable capability touches
+**five** places (channel → service → handler → type → bridge).
+
+### Add a new IPC handler
+
+1. **Channel** — add a constant to [ipc/channels.ts](./ipc/channels.ts):
+   ```ts
+   SYSTEM_READ_CLIPBOARD: 'system:read-clipboard'
+   ```
+2. **Service** — put the logic in `services/` (validate untrusted input here):
+   ```ts
+   // services/system.service.ts
+   function readClipboard(): string {
+     return clipboard.readText()
+   }
+   export const systemService = { /* … */ readClipboard }
+   ```
+3. **Handler** — wire channel → service in the matching `ipc/handlers/*.handler.ts`:
+   ```ts
+   ipcMain.handle(IPC_CHANNELS.SYSTEM_READ_CLIPBOARD, () => systemService.readClipboard())
+   ```
+   For a brand-new domain: create `xxx.handler.ts` with `registerXxxHandlers()`,
+   export it from `ipc/handlers/index.ts`, and call it in
+   [registerIpc.ts](./ipc/registerIpc.ts).
+
+### Add a new service
+
+Create `services/x.service.ts` exporting an object of functions (no `this`):
+
+```ts
+// services/window.service.ts
+import { BrowserWindow } from 'electron'
+
+function focusMain(): void {
+  BrowserWindow.getAllWindows()[0]?.focus()
+}
+export const windowService = { focusMain }
+```
+
+Call it **only** from a handler — never from the preload or renderer. Heavy
+logic, filesystem, and OS calls live here so handlers stay one line.
+
+### Add a new preload API bridge
+
+1. **Type** — extend the contract in [../preload/ipc/types.ts](../preload/ipc/types.ts):
+   ```ts
+   export interface SystemApi {
+     /* … */ readClipboard: () => Promise<string>
+   }
+   ```
+2. **Bridge method** — implement in the domain bridge, going through the typed
+   `invoke`/`send`/`on` wrappers and sanitizing input:
+   ```ts
+   // ../preload/bridge/system.bridge.ts
+   readClipboard: () => invoke<string>(IPC_CHANNELS.SYSTEM_READ_CLIPBOARD)
+   ```
+3. **A whole new domain?** Create `../preload/bridge/<domain>.bridge.ts`
+   exporting an object that implements its `RendererApi` slice, then compose it
+   into `api` in [../preload/index.ts](../preload/index.ts) and add it to
+   `RendererApi`. It's exposed via the existing `contextBridge.exposeInMainWorld('api', api)`
+   — you never call `exposeInMainWorld` again.
+
+Now `await window.api.system.readClipboard()` works, fully typed.
+
+### How to modify safely
+
+- **Rename a channel:** change it in `channels.ts` only — both the handler and
+  bridge import the constant, so they stay in sync. Never type a raw string.
+- **Change a handler's return/args:** update the `RendererApi` type + bridge in
+  the same change; TypeScript flags renderer callers.
+- **New window:** add `windows/createXWindow.ts` (secure `webPreferences`,
+  register with `windowManager`) and open it from `app/lifecycle.ts`.
+- Keep the security profile intact: `contextIsolation: true`,
+  `nodeIntegration: false`, preload as the only bridge.
+
+### Common mistakes
+
+- ❌ Calling `ipcMain`/`ipcRenderer` outside `ipc/handlers` (main) or the preload
+  bridge — no scattered IPC.
+- ❌ Raw channel strings anywhere but `channels.ts`.
+- ❌ Business logic in a handler or the preload — it belongs in a `service`.
+- ❌ Trusting renderer input — validate in the preload **and** the service.
+- ❌ A new `contextBridge.exposeInMainWorld` call — extend the existing `api` object.
+- ❌ Importing Node/Electron modules into a preload bridge beyond the IPC wrappers.

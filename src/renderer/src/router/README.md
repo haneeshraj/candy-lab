@@ -12,7 +12,8 @@ Client-side routing for the renderer, built on `react-router-dom` with a
 - `AppRouter.tsx` — the `HashRouter` entry; maps the table to `<Route>`s
 - `index.ts` — barrel
 
-`AppRouter` is rendered once in `main.tsx`.
+`AppRouter` is rendered once by `AppRoot` (`src/renderer/src/shell/`), which
+`main.tsx` mounts.
 
 ---
 

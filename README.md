@@ -14,8 +14,11 @@ An Electron + React + TypeScript application.
 | Desktop shell | Electron                                      |
 | UI            | React 19 + TypeScript                         |
 | Bundler       | electron-vite (Vite 7)                        |
+| Routing       | react-router-dom (HashRouter)                 |
+| State         | Zustand                                       |
 | Styling       | SCSS (modern `@use`/`@forward`) + CSS Modules |
 | Animation     | motion                                        |
+| Testing       | Vitest + React Testing Library                |
 | Packaging     | electron-builder                              |
 | Linting       | ESLint 9 (flat config) · Stylelint · Prettier |
 | Hooks / CI    | Husky + lint-staged · GitHub Actions          |
@@ -42,19 +45,24 @@ npm run dev      # launch the app with HMR
 
 ```
 src/
-├── main/        Electron main process (window, app lifecycle, IPC)
-├── preload/     Preload bridge (contextIsolation-safe APIs)
-└── renderer/    React app
-    └── src/
-        ├── components/   React components (+ co-located *.module.scss)
-        ├── styles/       Global SCSS architecture (see styles/GUIDE.md)
-        ├── App.tsx
-        └── main.tsx      Renderer entry — imports styles/main.scss (global)
+├── main/         Electron main process (windows, lifecycle, IPC, services) — main/GUIDE.md
+├── preload/      Secure preload bridge exposing window.api
+├── tests/        Vitest tests — tests/GUIDE.md
+└── renderer/src/ React app
+    ├── shell/        App composition — AppRoot runs bootstrap + theme, renders the router
+    ├── router/       HashRouter routing — router/README.md
+    ├── store/        Zustand domain stores — store/GUIDE.md
+    ├── hooks/        Reusable hooks — hooks/README.md
+    ├── animations/   Motion system — animations/README.md
+    ├── styles/       Global SCSS architecture — styles/GUIDE.md
+    ├── components/   React components (+ co-located *.module.scss)
+    ├── App.tsx       Root view (rendered at '/')
+    └── main.tsx      Renderer entry — renders <AppRoot/>
 ```
 
-Config lives at the root: `electron.vite.config.ts`, `electron-builder.yml`,
-`eslint.config.mjs`, `.stylelintrc.json`, `.prettierrc.yaml`, the `tsconfig.*`
-files, and `.github/workflows/ci.yml`.
+Config lives at the root: `electron.vite.config.ts`, `vitest.config.ts`,
+`electron-builder.yml`, `eslint.config.mjs`, `.stylelintrc.json`,
+`.prettierrc.yaml`, the `tsconfig.*` files, and `.github/workflows/ci.yml`.
 
 ---
 

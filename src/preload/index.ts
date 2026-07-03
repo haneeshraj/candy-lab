@@ -1,12 +1,20 @@
 import { contextBridge } from 'electron'
 import { electronAPI } from '@electron-toolkit/preload'
+import { appBridge } from './bridge/app.bridge'
+import { windowBridge } from './bridge/window.bridge'
+import { systemBridge } from './bridge/system.bridge'
+import type { RendererApi } from './ipc/types'
 
-// Custom APIs for renderer
-const api = {}
+// The single, curated API surface exposed to the renderer. Domain-grouped and
+// typed — no raw ipcRenderer and no Node APIs leak through.
+const api: RendererApi = {
+  app: appBridge,
+  window: windowBridge,
+  system: systemBridge
+}
 
-// Use `contextBridge` APIs to expose Electron APIs to
-// renderer only if context isolation is enabled, otherwise
-// just add to the DOM global.
+// Only expose via contextBridge when context isolation is on (it always is in
+// this app). `electron` is the toolkit's safe helper kept for convenience.
 if (process.contextIsolated) {
   try {
     contextBridge.exposeInMainWorld('electron', electronAPI)

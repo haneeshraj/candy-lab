@@ -1,0 +1,30 @@
+import { useEffect, type RefObject } from 'react'
+
+/**
+ * Call `handler` when a pointer press lands outside the referenced element.
+ * Common for closing dropdowns, popovers, and menus.
+ *
+ *   const ref = useRef<HTMLDivElement>(null)
+ *   useOnClickOutside(ref, close)
+ *
+ * Memoize `handler` (e.g. `useCallback`) if it isn't stable.
+ */
+export function useOnClickOutside<T extends HTMLElement>(
+  ref: RefObject<T | null>,
+  handler: (event: MouseEvent | TouchEvent) => void
+): void {
+  useEffect(() => {
+    const listener = (event: MouseEvent | TouchEvent): void => {
+      const el = ref.current
+      if (!el || el.contains(event.target as Node)) return
+      handler(event)
+    }
+
+    document.addEventListener('mousedown', listener)
+    document.addEventListener('touchstart', listener)
+    return () => {
+      document.removeEventListener('mousedown', listener)
+      document.removeEventListener('touchstart', listener)
+    }
+  }, [ref, handler])
+}

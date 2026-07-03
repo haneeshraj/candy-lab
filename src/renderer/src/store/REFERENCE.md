@@ -97,9 +97,10 @@ export const useXStore = create<XStore>()((set, get) => ({
 | `setLanguage(lang)` | `(language: string) => void` |
 | `reset()`           | `() => void`                 |
 
-**Persistence:** wrap the creator in Zustand's `persist` middleware later
-(localStorage, or a custom adapter over `window.api.system` for main-process
-storage). Shape is already persistence-ready.
+**Persistence:** implemented — the creator is wrapped in Zustand's `persist`
+middleware (`localStorage`, key `candy-lab-settings`, only state persisted).
+Swap in a custom `storage` adapter over `window.api.system` to persist to the
+main process instead.
 
 ---
 

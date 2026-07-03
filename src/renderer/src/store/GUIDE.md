@@ -94,14 +94,16 @@ useElectronStore.getState().setVersion('1.0.0')
 
 ---
 
-## Future integration (prepared, not implemented)
+## Integration
 
-- **Persistence** — `settings` is the domain to persist. Wrap its creator in
-  Zustand's `persist` middleware (localStorage, or a custom adapter over
-  `window.api.system.getSetting/setSetting` for main-process storage).
-- **IPC bridging** — `electron` mirrors main-process values. A small hook will
-  read `window.api` and call the store's setters; the store never talks to IPC
-  itself.
+- **Persistence** — implemented for `settings`: its creator is wrapped in
+  Zustand's `persist` middleware (localStorage). Swap in a custom `storage`
+  adapter over `window.api.system.getSetting/setSetting` to persist to the main
+  process instead.
+- **IPC bridging** — implemented for `electron`: the `useAppBootstrap` hook
+  (in `src/renderer/src/shell/`) reads `window.api` and calls the store's setters
+  on startup. The store itself never talks to IPC. The theme is applied from the
+  `settings` store to `<html data-theme>` by `useThemeSync`.
 
 ---
 

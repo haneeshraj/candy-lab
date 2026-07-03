@@ -43,7 +43,8 @@
     "@electron-toolkit/preload": "^3.0.2",
     "@electron-toolkit/utils": "^4.0.0",
     "electron-updater": "^6.3.9",
-    "motion": "^12.42.2"
+    "motion": "^12.42.2",
+    "react-router-dom": "^7.18.1"
   },
   "devDependencies": {
     "@electron-toolkit/eslint-config-prettier": "^3.0.0",

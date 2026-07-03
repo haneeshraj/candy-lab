@@ -10,8 +10,8 @@ All SCSS members below are available in any file after:
 @use 'abstracts' as *;
 ```
 
-`rem()` values assume the 16px document root. `space()` steps come from the
-`$spacing` map.
+The document root is `62.5%`, so **1rem = 10px** and `rem()` returns px ÷ 10.
+`space()` steps come from the `$spacing` map.
 
 ---
 
@@ -125,18 +125,18 @@ Defined in `abstracts/_variables.scss`.
 | `$font-family-base` | `$font-sans`                       |
 | `$font-family-mono` | `$font-mono`                       |
 
-**Font sizes** (`$font-size-root` = `16px`)
+**Font sizes** (`$font-size-root` = `62.5%` → **1rem = 10px**)
 
-| Variable         | px  | rem      |
-| ---------------- | --- | -------- |
-| `$font-size-xs`  | 12  | 0.75rem  |
-| `$font-size-sm`  | 14  | 0.875rem |
-| `$font-size-md`  | 16  | 1rem     |
-| `$font-size-lg`  | 18  | 1.125rem |
-| `$font-size-xl`  | 20  | 1.25rem  |
-| `$font-size-2xl` | 24  | 1.5rem   |
-| `$font-size-3xl` | 30  | 1.875rem |
-| `$font-size-4xl` | 36  | 2.25rem  |
+| Variable         | px  | rem    |
+| ---------------- | --- | ------ |
+| `$font-size-xs`  | 12  | 1.2rem |
+| `$font-size-sm`  | 14  | 1.4rem |
+| `$font-size-md`  | 16  | 1.6rem |
+| `$font-size-lg`  | 18  | 1.8rem |
+| `$font-size-xl`  | 20  | 2rem   |
+| `$font-size-2xl` | 24  | 2.4rem |
+| `$font-size-3xl` | 30  | 3rem   |
+| `$font-size-4xl` | 36  | 3.6rem |
 
 **Font weights:** `$font-weight-light` 300 · `-regular` 400 · `-medium` 500 ·
 `-semibold` 600 · `-bold` 700
@@ -147,8 +147,8 @@ Defined in `abstracts/_variables.scss`.
 **Letter spacing:** `$letter-spacing-tight` −0.01em · `-normal` 0 · `-wide`
 0.02em · `-wider` 0.06em
 
-> Root font-size scales to `17px` at the `xl` breakpoint (see
-> `base/_typography.scss`).
+> The root is `62.5%` (10px) so `1rem = 10px` — clean px↔rem math. The `rem()`
+> helper divides by this same 10px base, so tokens stay pixel-accurate.
 
 ---
 
@@ -157,28 +157,28 @@ Defined in `abstracts/_variables.scss`.
 `$spacing` map in `abstracts/_variables.scss`. Access with `space($step)`.
 Powers the `m-*`/`p-*`/`gap-*` utilities.
 
-| Step | px  | rem     |     | Step | px  | rem    |
-| ---- | --- | ------- | --- | ---- | --- | ------ |
-| `0`  | 0   | 0       |     | `6`  | 24  | 1.5rem |
-| `1`  | 4   | 0.25rem |     | `8`  | 32  | 2rem   |
-| `2`  | 8   | 0.5rem  |     | `10` | 40  | 2.5rem |
-| `3`  | 12  | 0.75rem |     | `12` | 48  | 3rem   |
-| `4`  | 16  | 1rem    |     | `16` | 64  | 4rem   |
-| `5`  | 20  | 1.25rem |     | `20` | 80  | 5rem   |
-|      |     |         |     | `24` | 96  | 6rem   |
+| Step | px  | rem    |     | Step | px  | rem    |
+| ---- | --- | ------ | --- | ---- | --- | ------ |
+| `0`  | 0   | 0      |     | `6`  | 24  | 2.4rem |
+| `1`  | 4   | 0.4rem |     | `8`  | 32  | 3.2rem |
+| `2`  | 8   | 0.8rem |     | `10` | 40  | 4rem   |
+| `3`  | 12  | 1.2rem |     | `12` | 48  | 4.8rem |
+| `4`  | 16  | 1.6rem |     | `16` | 64  | 6.4rem |
+| `5`  | 20  | 2rem   |     | `20` | 80  | 8rem   |
+|      |     |        |     | `24` | 96  | 9.6rem |
 
 ---
 
 ## Border radius
 
-| Variable         | Value   |
-| ---------------- | ------- |
-| `$radius-sm`     | 0.25rem |
-| `$radius-md`     | 0.5rem  |
-| `$radius-lg`     | 0.75rem |
-| `$radius-xl`     | 1.25rem |
-| `$radius-pill`   | 9999px  |
-| `$radius-circle` | 50%     |
+| Variable         | Value  | px   |
+| ---------------- | ------ | ---- |
+| `$radius-sm`     | 0.4rem | 4px  |
+| `$radius-md`     | 0.8rem | 8px  |
+| `$radius-lg`     | 1.2rem | 12px |
+| `$radius-xl`     | 2rem   | 20px |
+| `$radius-pill`   | 9999px | —    |
+| `$radius-circle` | 50%    | —    |
 
 ---
 
@@ -232,17 +232,17 @@ Apply directly (`box-shadow: $shadow-md;`) or via `@include elevation(md)`.
 
 ## Layout & sizing
 
-| Variable                | Value    | Use                          |
-| ----------------------- | -------- | ---------------------------- |
-| `$layout-max-width`     | 1280px   | Widest content container     |
-| `$layout-content-width` | 960px    | Reading-width container      |
-| `$layout-narrow-width`  | 640px    | Narrow / form container      |
-| `$titlebar-height`      | 2rem     | Custom title bar height      |
-| `$control-height`       | 2.375rem | Default button/input height  |
-| `$control-height-sm`    | 1.875rem | Small control                |
-| `$control-height-lg`    | 2.875rem | Large control                |
-| `$border-width`         | 1px      | Standard border              |
-| `$border-width-thick`   | 2px      | Focus ring / emphasis border |
+| Variable                | Value         | Use                          |
+| ----------------------- | ------------- | ---------------------------- |
+| `$layout-max-width`     | 1280px        | Widest content container     |
+| `$layout-content-width` | 960px         | Reading-width container      |
+| `$layout-narrow-width`  | 640px         | Narrow / form container      |
+| `$titlebar-height`      | 3.2rem (32px) | Custom title bar height      |
+| `$control-height`       | 3.8rem (38px) | Default button/input height  |
+| `$control-height-sm`    | 3rem (30px)   | Small control                |
+| `$control-height-lg`    | 4.6rem (46px) | Large control                |
+| `$border-width`         | 1px           | Standard border              |
+| `$border-width-thick`   | 2px           | Focus ring / emphasis border |
 
 ---
 
@@ -279,8 +279,8 @@ Apply directly (`box-shadow: $shadow-md;`) or via `@include elevation(md)`.
 
 | Signature                     | Returns / notes                                                       |
 | ----------------------------- | --------------------------------------------------------------------- |
-| `rem($px, $base: 16px)`       | px → `rem`. Accepts unitless or `px`. `rem(24px)` → `1.5rem`.         |
-| `em($px, $base: 16px)`        | px → `em`.                                                            |
+| `rem($px, $base: 10px)`       | px → `rem`. Accepts unitless or `px`. `rem(24px)` → `2.4rem`.         |
+| `em($px, $base: 10px)`        | px → `em`.                                                            |
 | `with-alpha($color, $amount)` | Color at `$amount` (0–1) opacity via `color-mix`. Works with `var()`. |
 | `tint($color, $amount)`       | Mix toward white by `$amount` (0–1). Works with `var()`.              |
 | `shade($color, $amount)`      | Mix toward black by `$amount` (0–1). Works with `var()`.              |
@@ -288,8 +288,8 @@ Apply directly (`box-shadow: $shadow-md;`) or via `@include elevation(md)`.
 | `z($layer)`                   | Value from the `$z-layers` map. Errors on unknown layer.              |
 
 ```scss
-padding: space(4); //  1rem
-width: rem(320px); //  20rem
+padding: space(4); //  1.6rem  (16px)
+width: rem(320px); //  32rem   (320px)
 background: with-alpha(
   $primary,
   0.15

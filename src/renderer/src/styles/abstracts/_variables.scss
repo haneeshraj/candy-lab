@@ -25,8 +25,9 @@ $font-mono:
 $font-family-base: $font-sans;
 $font-family-mono: $font-mono;
 
-// Root size drives every `rem()`; keep in sync with `functions.$root-font-size`.
-$font-size-root: 16px;
+// Applied to <html>. 62.5% of the 16px browser default = 10px, making 1rem =
+// 10px. Keep in sync with `functions.$root-font-size` (the rem() divisor).
+$font-size-root: 62.5%;
 $font-size-xs: rem(12px);
 $font-size-sm: rem(14px);
 $font-size-md: rem(16px);

@@ -7,10 +7,12 @@
 
 @use 'sass:math';
 
-$root-font-size: 16px !default;
+// The document root is set to 62.5% (10px) in base/_typography.scss, so 1rem =
+// 10px. This divisor MUST match that actual root size for rem() to be accurate.
+$root-font-size: 10px !default;
 
 /// Convert a px value to rem, relative to the document root font size.
-/// @example rem(24px) // => 1.5rem
+/// @example rem(24px) // => 2.4rem  (renders as 24px at the 10px root)
 @function rem($px, $base: $root-font-size) {
   @if math.is-unitless($px) {
     $px: $px * 1px;

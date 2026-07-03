@@ -4,13 +4,10 @@
 
 @use 'abstracts' as *;
 
+// Root size: 62.5% → 1rem = 10px. Everything else is expressed in rem via the
+// design tokens, so the whole UI scales from this single value.
 html {
   font-size: $font-size-root;
-
-  // Subtle upscale on large desktop displays for comfortable reading.
-  @include media(xl) {
-    font-size: 17px;
-  }
 }
 
 body {

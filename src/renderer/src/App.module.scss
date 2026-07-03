@@ -1,0 +1,93 @@
+@use 'abstracts' as *;
+
+// React & TypeScript brand gradient colors. These are third-party brand hues
+// used purely to render their logos/wordmarks — intentionally kept local and
+// out of the design palette. The raw-hex ban is disabled for this block only.
+/* stylelint-disable color-no-hex */
+$brand-react-from: #087ea4;
+$brand-react-to: #7c93ee;
+$brand-ts-from: #3178c6;
+$brand-ts-to: #f0dc4e;
+/* stylelint-enable color-no-hex */
+
+.app {
+  @include flex(column, center, center);
+
+  flex: 1 1 auto;
+  min-height: 0;
+  padding: space(6);
+  text-align: center;
+  background-image: url('./assets/wavy-lines.svg');
+  background-size: cover;
+}
+
+.logo {
+  width: rem(128px);
+  height: rem(128px);
+  margin-bottom: space(5);
+  -webkit-user-drag: none;
+  will-change: filter;
+  transition: filter $duration-slow $ease-standard;
+
+  @include hover {
+    filter: drop-shadow(0 0 1.2em with-alpha($primary, 0.4));
+  }
+}
+
+.creator {
+  margin-bottom: space(2);
+  font-size: $font-size-sm;
+  font-weight: $font-weight-semibold;
+  color: $text-secondary;
+}
+
+.text {
+  margin: 0 space(2);
+  padding: space(4) 0;
+  font-size: $font-size-3xl;
+  font-weight: $font-weight-bold;
+  line-height: $line-height-tight;
+  color: $text-primary;
+}
+
+.tip {
+  font-size: $font-size-md;
+  font-weight: $font-weight-semibold;
+  color: $text-secondary;
+}
+
+.react {
+  font-weight: $font-weight-bold;
+  background: linear-gradient(315deg, $brand-react-from 55%, $brand-react-to);
+  background-clip: text;
+  -webkit-text-fill-color: transparent;
+}
+
+.ts {
+  font-weight: $font-weight-bold;
+  background: linear-gradient(315deg, $brand-ts-from 45%, $brand-ts-to);
+  background-clip: text;
+  -webkit-text-fill-color: transparent;
+}
+
+.actions {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: space(3);
+  padding-top: space(8);
+}
+
+.action {
+  @include button-base;
+
+  color: $text-primary;
+  background-color: $surface;
+  border-color: $border;
+  border-radius: $radius-pill;
+
+  @include hover {
+    border-color: $primary;
+    background-color: $surface-light;
+  }
+}

@@ -1,0 +1,9 @@
+// ===========================================================================
+// Base — forwarded in cascade order (reset first, decoration last).
+// ===========================================================================
+
+@forward 'reset';
+@forward 'typography';
+@forward 'globals';
+@forward 'scrollbar';
+@forward 'selection';

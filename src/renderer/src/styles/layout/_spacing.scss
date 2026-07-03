@@ -1,0 +1,34 @@
+// ===========================================================================
+// Structural spacing primitives
+// ---------------------------------------------------------------------------
+// Flow patterns (stack / cluster) for consistent rhythm between elements.
+// For one-off margin/padding, use the spacing utilities instead.
+// ===========================================================================
+
+@use 'abstracts' as *;
+
+// Vertical rhythm: space between stacked children.
+.stack > * + * {
+  margin-top: space(4);
+}
+
+.stack--sm > * + * {
+  margin-top: space(2);
+}
+
+.stack--lg > * + * {
+  margin-top: space(8);
+}
+
+// Horizontal group that wraps gracefully.
+.cluster {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: space(3);
+}
+
+// Padded page section.
+.section {
+  padding-block: space(12);
+}

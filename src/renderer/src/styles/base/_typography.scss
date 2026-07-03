@@ -1,0 +1,85 @@
+// ===========================================================================
+// Typography defaults
+// ===========================================================================
+
+@use 'abstracts' as *;
+
+html {
+  font-size: $font-size-root;
+
+  // Subtle upscale on large desktop displays for comfortable reading.
+  @include media(xl) {
+    font-size: 17px;
+  }
+}
+
+body {
+  font-family: $font-family-base;
+  font-size: $font-size-md;
+  font-weight: $font-weight-regular;
+  line-height: $line-height-normal;
+  color: $text-primary;
+  background-color: $background;
+}
+
+h1,
+h2,
+h3,
+h4,
+h5,
+h6 {
+  font-weight: $font-weight-bold;
+  line-height: $line-height-tight;
+  letter-spacing: $letter-spacing-tight;
+}
+
+h1 {
+  font-size: $font-size-4xl;
+}
+
+h2 {
+  font-size: $font-size-3xl;
+}
+
+h3 {
+  font-size: $font-size-2xl;
+}
+
+h4 {
+  font-size: $font-size-xl;
+}
+
+h5 {
+  font-size: $font-size-lg;
+}
+
+h6 {
+  font-size: $font-size-md;
+}
+
+p {
+  line-height: $line-height-normal;
+}
+
+label {
+  font-size: $font-size-sm;
+  font-weight: $font-weight-medium;
+}
+
+small {
+  font-size: $font-size-sm;
+  color: $text-secondary;
+}
+
+strong,
+b {
+  font-weight: $font-weight-semibold;
+}
+
+code,
+kbd,
+pre,
+samp {
+  font-family: $font-family-mono;
+  font-size: 0.9em;
+}

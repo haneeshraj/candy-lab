@@ -1,0 +1,10 @@
+// ===========================================================================
+// Themes
+// ---------------------------------------------------------------------------
+// Dark is the default (:root). To add a theme, create `_yourtheme.scss` that
+// redefines the same `--color-*` / `--shadow-*` set under
+// `[data-theme='yourtheme']`, then forward it here.
+// ===========================================================================
+
+@forward 'dark';
+@forward 'light';

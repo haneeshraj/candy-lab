@@ -1,0 +1,58 @@
+{
+  "extends": ["stylelint-config-standard-scss"],
+  "plugins": ["stylelint-order"],
+  "rules": {
+    "color-no-hex": [
+      true,
+      { "message": "Use a design token (see styles/abstracts/_colors.scss), not a raw hex value." }
+    ],
+    "scss/dollar-variable-colon-space-after": "always-single-line",
+    "max-nesting-depth": [
+      3,
+      {
+        "ignoreAtRules": [
+          "include",
+          "media",
+          "supports",
+          "each",
+          "for",
+          "if",
+          "else",
+          "mixin",
+          "content"
+        ]
+      }
+    ],
+    "declaration-no-important": true,
+    "selector-class-pattern": [
+      "^[a-z][a-zA-Z0-9]*(-{1,2}[a-z0-9]+)*$",
+      {
+        "message": "Class names must be kebab-case (globals) or camelCase (CSS Modules), with optional BEM `--modifier`.",
+        "resolveNestedSelectors": true
+      }
+    ],
+    "order/order": [
+      ["dollar-variables", "custom-properties", "declarations", "rules"],
+      { "unspecified": "ignore" }
+    ],
+    "no-descending-specificity": null,
+    "scss/no-global-function-names": null,
+    "scss/comment-no-empty": null,
+    "value-keyword-case": null
+  },
+  "overrides": [
+    {
+      "files": ["**/abstracts/_colors.scss"],
+      "rules": {
+        "color-no-hex": null
+      }
+    },
+    {
+      "files": ["**/base/_reset.scss"],
+      "rules": {
+        "declaration-no-important": null
+      }
+    }
+  ],
+  "ignoreFiles": ["**/node_modules/**", "out/**", "dist/**"]
+}

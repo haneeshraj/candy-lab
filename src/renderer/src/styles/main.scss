@@ -1,0 +1,28 @@
+// ===========================================================================
+// candy-lab — global stylesheet entry
+// ---------------------------------------------------------------------------
+// Import order matters: tokens/tools first, then progressively more specific
+// output. Component styles are NOT imported here — they live in co-located
+// `*.module.scss` files and pull tokens/mixins via `@use 'abstracts' as *;`.
+// ===========================================================================
+
+// 1. Abstracts — design tokens, functions, mixins (emits no CSS)
+@use 'abstracts';
+
+// Global @keyframes (kept out of component modules; see abstracts/_animations)
+@use 'abstracts/animations';
+
+// 2. Base — reset, element defaults, typography
+@use 'base';
+
+// 3. Layout — structural building blocks
+@use 'layout';
+
+// 4. Utilities — atomic helper classes
+@use 'utilities';
+
+// 5. Themes — semantic tokens exposed as CSS custom properties
+@use 'themes';
+
+// 6. Vendors — third-party overrides
+@use 'vendors';

@@ -1,0 +1,48 @@
+// ===========================================================================
+// Light theme
+// ---------------------------------------------------------------------------
+// Opt in by setting `data-theme="light"` on <html>. Because every semantic
+// token is a CSS custom property, switching themes needs no recompilation.
+// ===========================================================================
+
+@use 'sass:color';
+@use '../abstracts/colors' as *;
+
+[data-theme='light'] {
+  // Brand
+  --color-primary: #{$palette-dark-gold};
+  --color-primary-dark: #{$palette-gold};
+  --color-secondary: #{$palette-red};
+  --color-secondary-dark: #{$palette-dark-red};
+
+  // Surfaces
+  --color-background: #{$palette-light-cream};
+  --color-surface: #{color.adjust($palette-light-cream, $lightness: 4%)};
+  --color-surface-light: #{$palette-white};
+
+  // Text
+  --color-text-primary: #{$palette-dark-red};
+  --color-text-secondary: #{color.change($palette-dark-red, $alpha: 0.7)};
+
+  // Lines
+  --color-border: #{color.change($palette-dark-red, $alpha: 0.14)};
+  --color-divider: #{color.change($palette-dark-red, $alpha: 0.08)};
+
+  // Status
+  --color-success: #{$palette-success};
+  --color-warning: #{$palette-warning};
+  --color-error: #{$palette-error};
+  --color-info: #{$palette-info};
+
+  // Interaction
+  --color-focus-ring: #{color.change($palette-dark-gold, $alpha: 0.6)};
+  --color-overlay: #{color.change($palette-dark-red, $alpha: 0.4)};
+
+  // Elevation, tuned for light surfaces
+  --shadow-sm: 0 1px 2px rgb(58 17 19 / 10%);
+  --shadow-md: 0 4px 12px rgb(58 17 19 / 12%);
+  --shadow-lg: 0 12px 32px rgb(58 17 19 / 16%);
+  --shadow-xl: 0 24px 64px rgb(58 17 19 / 20%);
+
+  color-scheme: light;
+}

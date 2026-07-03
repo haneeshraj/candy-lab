@@ -1,0 +1,29 @@
+// ===========================================================================
+// Z-index scale
+// ---------------------------------------------------------------------------
+// Centralize stacking order so layers never fight with magic numbers.
+// ===========================================================================
+
+@use 'sass:map';
+
+$z-layers: (
+  base: 0,
+  dropdown: 1000,
+  sticky: 1100,
+  overlay: 1200,
+  modal: 1300,
+  popover: 1400,
+  toast: 1500,
+  tooltip: 1600,
+  titlebar: 1700
+);
+
+/// Return the z-index for a named layer.
+/// @example z-index: z(modal);
+@function z($layer) {
+  @if not map.has-key($z-layers, $layer) {
+    @error "Unknown z-layer `#{$layer}`. Valid: #{map.keys($z-layers)}.";
+  }
+
+  @return map.get($z-layers, $layer);
+}

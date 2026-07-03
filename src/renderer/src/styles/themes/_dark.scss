@@ -1,0 +1,50 @@
+// ===========================================================================
+// Dark theme (default)
+// ---------------------------------------------------------------------------
+// Maps the raw palette onto the semantic CSS custom properties consumed by the
+// `$primary`, `$surface`, … tokens. This is the default (applied on `:root`),
+// and also under `[data-theme='dark']` for explicit selection.
+// ===========================================================================
+
+@use 'sass:color';
+@use '../abstracts/colors' as *;
+
+:root,
+[data-theme='dark'] {
+  // Brand
+  --color-primary: #{$palette-gold};
+  --color-primary-dark: #{$palette-dark-gold};
+  --color-secondary: #{$palette-red};
+  --color-secondary-dark: #{$palette-dark-red};
+
+  // Surfaces
+  --color-background: #{$palette-ink};
+  --color-surface: #{$palette-ink-soft};
+  --color-surface-light: #{$palette-ink-mute};
+
+  // Text
+  --color-text-primary: #{$palette-light-cream};
+  --color-text-secondary: #{color.change($palette-light-cream, $alpha: 0.64)};
+
+  // Lines
+  --color-border: #{color.change($palette-light-cream, $alpha: 0.12)};
+  --color-divider: #{color.change($palette-light-cream, $alpha: 0.08)};
+
+  // Status
+  --color-success: #{$palette-success};
+  --color-warning: #{$palette-warning};
+  --color-error: #{$palette-error};
+  --color-info: #{$palette-info};
+
+  // Interaction
+  --color-focus-ring: #{color.change($palette-gold, $alpha: 0.6)};
+  --color-overlay: #{color.change($palette-ink, $alpha: 0.6)};
+
+  // Elevation, tuned for dark surfaces
+  --shadow-sm: 0 1px 2px rgb(0 0 0 / 40%);
+  --shadow-md: 0 4px 12px rgb(0 0 0 / 45%);
+  --shadow-lg: 0 12px 32px rgb(0 0 0 / 50%);
+  --shadow-xl: 0 24px 64px rgb(0 0 0 / 55%);
+
+  color-scheme: dark;
+}

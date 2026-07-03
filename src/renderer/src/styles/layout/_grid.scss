@@ -1,0 +1,25 @@
+// ===========================================================================
+// Grid
+// ===========================================================================
+
+@use 'abstracts' as *;
+
+.grid {
+  @include grid;
+}
+
+.grid--2 {
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+}
+
+.grid--3 {
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+}
+
+.grid--4 {
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+}
+
+.grid--auto {
+  grid-template-columns: repeat(auto-fill, minmax(rem(240px), 1fr));
+}

@@ -1,0 +1,33 @@
+// ===========================================================================
+// Application shell
+// ---------------------------------------------------------------------------
+// Full-height column that fills the (resizable) window. `min-height: 0` on the
+// flex children lets inner regions scroll instead of overflowing the window.
+// ===========================================================================
+
+@use 'abstracts' as *;
+
+html,
+body,
+#root {
+  height: 100%;
+}
+
+#root {
+  display: flex;
+  flex-direction: column;
+  min-height: 100vh;
+}
+
+.app-shell {
+  display: flex;
+  flex: 1 1 auto;
+  flex-direction: column;
+  min-height: 0;
+}
+
+.app-body {
+  flex: 1 1 auto;
+  min-height: 0;
+  overflow: auto;
+}

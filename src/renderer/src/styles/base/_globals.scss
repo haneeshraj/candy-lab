@@ -1,0 +1,62 @@
+// ===========================================================================
+// Global element defaults
+// ===========================================================================
+
+@use 'abstracts' as *;
+
+#root {
+  height: 100%;
+}
+
+body {
+  // The window shell owns scrolling; individual views scroll their own region.
+  overflow: hidden;
+}
+
+a {
+  color: $primary;
+  transition: $transition-colors;
+
+  @include hover {
+    color: $primary-dark;
+  }
+}
+
+button {
+  cursor: pointer;
+
+  &:disabled {
+    opacity: $opacity-disabled;
+    cursor: not-allowed;
+  }
+}
+
+input,
+textarea,
+select {
+  padding: space(2) space(3);
+  color: $text-primary;
+  background-color: $surface;
+  border: $border-width solid $border;
+  border-radius: $radius-md;
+  transition: $transition-colors;
+
+  &::placeholder {
+    color: $text-secondary;
+  }
+
+  &:focus-visible {
+    outline: none;
+    border-color: $primary;
+    box-shadow: 0 0 0 3px $focus-ring;
+  }
+}
+
+// Keyboard-only focus ring; mouse clicks stay clean.
+:focus-visible {
+  @include focus-ring;
+}
+
+:focus:not(:focus-visible) {
+  outline: none;
+}

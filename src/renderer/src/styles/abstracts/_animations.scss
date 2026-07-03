@@ -1,0 +1,82 @@
+// ===========================================================================
+// Animations — global @keyframes
+// ---------------------------------------------------------------------------
+// NOTE: This file is intentionally NOT forwarded by `abstracts/_index.scss`.
+// Keyframes emit CSS, and if they were pulled into a `*.module.scss` file the
+// CSS Modules compiler would hash the keyframe names. They are emitted exactly
+// once, globally, from `main.scss`. Reference them by name in any component
+// (e.g. `animation: fade-in var(--x)`) — the names stay global.
+// ===========================================================================
+
+@keyframes fade-in {
+  from {
+    opacity: 0;
+  }
+
+  to {
+    opacity: 1;
+  }
+}
+
+@keyframes fade-out {
+  from {
+    opacity: 1;
+  }
+
+  to {
+    opacity: 0;
+  }
+}
+
+@keyframes slide-up {
+  from {
+    opacity: 0;
+    transform: translateY(8px);
+  }
+
+  to {
+    opacity: 1;
+    transform: none;
+  }
+}
+
+@keyframes slide-down {
+  from {
+    opacity: 0;
+    transform: translateY(-8px);
+  }
+
+  to {
+    opacity: 1;
+    transform: none;
+  }
+}
+
+@keyframes scale-in {
+  from {
+    opacity: 0;
+    transform: scale(0.96);
+  }
+
+  to {
+    opacity: 1;
+    transform: scale(1);
+  }
+}
+
+@keyframes spin {
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+@keyframes pulse {
+  0%,
+  100% {
+    opacity: 1;
+  }
+
+  50% {
+    opacity: 0.5;
+  }
+}

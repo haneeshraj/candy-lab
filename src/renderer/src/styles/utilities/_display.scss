@@ -1,0 +1,21 @@
+// ===========================================================================
+// Display utilities
+// ---------------------------------------------------------------------------
+// `flex`/`grid` display live in their dedicated files to avoid duplication.
+// ===========================================================================
+
+.block {
+  display: block;
+}
+
+.inline-block {
+  display: inline-block;
+}
+
+.inline {
+  display: inline;
+}
+
+.contents {
+  display: contents;
+}

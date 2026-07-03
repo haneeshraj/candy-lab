@@ -1,0 +1,64 @@
+// ===========================================================================
+// Colors
+// ---------------------------------------------------------------------------
+// The raw palette below is the ONLY place literal hex values may live.
+// Everywhere else, reference the semantic tokens at the bottom of this file.
+// ===========================================================================
+
+// --- Brand palette ---------------------------------------------------------
+$palette-dark-red: #3a1113;
+$palette-red: #5d1b1e;
+$palette-dark-gold: #9a6e32;
+$palette-gold: #c69953;
+$palette-light-cream: #efe7d3;
+
+// --- Status hues (kept separate from the brand palette) --------------------
+$palette-success: #3e8e5a;
+$palette-warning: #d9a441;
+$palette-error: #b23a3a;
+$palette-info: #4a6d8c;
+
+// --- Neutral anchors for dark UI surfaces ----------------------------------
+$palette-ink: #160a0b; // near-black with a red undertone
+$palette-ink-soft: #21100f;
+$palette-ink-mute: #2c1817;
+$palette-white: #fff;
+
+// ===========================================================================
+// Semantic tokens
+// ---------------------------------------------------------------------------
+// These resolve to CSS custom properties defined per theme (see styles/themes),
+// so writing `color: $primary;` compiles to `color: var(--color-primary);` and
+// switches automatically when `[data-theme]` changes at runtime.
+//
+// Use THESE names in components, mixins, and utilities — never the palette.
+// ===========================================================================
+
+// Brand
+$primary: var(--color-primary);
+$primary-dark: var(--color-primary-dark);
+$secondary: var(--color-secondary);
+$secondary-dark: var(--color-secondary-dark);
+
+// Surfaces
+$background: var(--color-background);
+$surface: var(--color-surface);
+$surface-light: var(--color-surface-light);
+
+// Text
+$text-primary: var(--color-text-primary);
+$text-secondary: var(--color-text-secondary);
+
+// Lines
+$border: var(--color-border);
+$divider: var(--color-divider);
+
+// Status
+$success: var(--color-success);
+$warning: var(--color-warning);
+$error: var(--color-error);
+$info: var(--color-info);
+
+// Interaction helpers
+$focus-ring: var(--color-focus-ring);
+$overlay: var(--color-overlay);

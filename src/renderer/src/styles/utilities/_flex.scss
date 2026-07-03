@@ -1,0 +1,65 @@
+// ===========================================================================
+// Flex utilities
+// ===========================================================================
+
+@use 'sass:map';
+@use 'abstracts' as *;
+
+.flex {
+  display: flex;
+}
+
+.inline-flex {
+  display: inline-flex;
+}
+
+.flex-col {
+  flex-direction: column;
+}
+
+.flex-row {
+  flex-direction: row;
+}
+
+.flex-wrap {
+  flex-wrap: wrap;
+}
+
+.flex-1 {
+  flex: 1 1 0%;
+}
+
+.flex-center {
+  @include flex-center;
+}
+
+.flex-between {
+  @include flex-between;
+}
+
+.items-center {
+  align-items: center;
+}
+
+.items-start {
+  align-items: flex-start;
+}
+
+.items-end {
+  align-items: flex-end;
+}
+
+.justify-center {
+  justify-content: center;
+}
+
+.justify-between {
+  justify-content: space-between;
+}
+
+// gap-0 … gap-24, generated from the spacing scale.
+@each $step, $value in $spacing {
+  .gap-#{$step} {
+    gap: $value;
+  }
+}

@@ -1,0 +1,16 @@
+// ===========================================================================
+// Abstracts — public API
+// ---------------------------------------------------------------------------
+// Forward every OUTPUT-FREE abstract (tokens, functions, mixins) so a single
+// `@use 'abstracts' as *;` gives a file the whole design system with zero CSS.
+//
+// `_animations.scss` (global @keyframes) is deliberately excluded — see the
+// note in that file. It is emitted once from `main.scss`.
+// ===========================================================================
+
+@forward 'functions';
+@forward 'colors';
+@forward 'breakpoints';
+@forward 'z-index';
+@forward 'variables';
+@forward 'mixins';

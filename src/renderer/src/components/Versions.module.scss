@@ -1,0 +1,30 @@
+@use 'abstracts' as *;
+
+.versions {
+  position: absolute;
+  bottom: space(6);
+  display: inline-flex;
+  align-items: center;
+  padding: space(3) 0;
+  overflow: hidden;
+  font-family: $font-family-mono;
+  border-radius: $radius-xl;
+
+  @include glass($surface, 24px, 0.6);
+
+  @include media-max(md) {
+    display: none;
+  }
+}
+
+.item {
+  padding: 0 space(5);
+  font-size: $font-size-sm;
+  line-height: 1;
+  color: $text-secondary;
+  border-right: $border-width solid $divider;
+
+  &:last-child {
+    border-right: none;
+  }
+}

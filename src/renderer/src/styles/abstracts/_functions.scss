@@ -1,0 +1,47 @@
+// ===========================================================================
+// Functions
+// ---------------------------------------------------------------------------
+// Pure helpers with no dependency on other abstracts (keeps the module graph
+// acyclic). Spacing helpers that need the scale live in `_variables.scss`.
+// ===========================================================================
+
+@use 'sass:math';
+
+$root-font-size: 16px !default;
+
+/// Convert a px value to rem, relative to the document root font size.
+/// @example rem(24px) // => 1.5rem
+@function rem($px, $base: $root-font-size) {
+  @if math.is-unitless($px) {
+    $px: $px * 1px;
+  }
+
+  @return math.div($px, $base) * 1rem;
+}
+
+/// Convert a px value to em, relative to a base font size.
+@function em($px, $base: $root-font-size) {
+  @if math.is-unitless($px) {
+    $px: $px * 1px;
+  }
+
+  @return math.div($px, $base) * 1em;
+}
+
+/// Apply alpha to any color, including CSS custom properties.
+/// Uses `color-mix` so it works with the var()-based semantic tokens.
+/// Named `with-alpha` to avoid shadowing Sass's built-in `alpha()`.
+/// @param {Number} $amount - 0–1 opacity.
+@function with-alpha($color, $amount) {
+  @return color-mix(in srgb, #{$color} #{$amount * 100%}, transparent);
+}
+
+/// Lighten a color by mixing it with white (works with var()-based tokens).
+@function tint($color, $amount) {
+  @return color-mix(in srgb, #{$color}, white #{$amount * 100%});
+}
+
+/// Darken a color by mixing it with black (works with var()-based tokens).
+@function shade($color, $amount) {
+  @return color-mix(in srgb, #{$color}, black #{$amount * 100%});
+}

@@ -1,0 +1,20 @@
+// ===========================================================================
+// Containers — width-constrained, centered content wrappers
+// ===========================================================================
+
+@use 'abstracts' as *;
+
+.container {
+  width: 100%;
+  max-width: $layout-max-width;
+  margin-inline: auto;
+  padding-inline: space(6);
+}
+
+.container--content {
+  max-width: $layout-content-width;
+}
+
+.container--narrow {
+  max-width: $layout-narrow-width;
+}

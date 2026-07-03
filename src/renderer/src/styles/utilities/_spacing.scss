@@ -1,0 +1,47 @@
+// ===========================================================================
+// Spacing utilities — margin & padding, generated from the spacing scale
+// ---------------------------------------------------------------------------
+// Naming: m/p + optional side (t/r/b/l) or axis (x/y) + step.
+//   .mt-4  → margin-top: space(4)
+//   .px-6  → padding-inline: space(6)
+// ===========================================================================
+
+@use 'abstracts' as *;
+
+$sides: (
+  t: top,
+  r: right,
+  b: bottom,
+  l: left
+);
+
+@each $step, $value in $spacing {
+  .m-#{$step} {
+    margin: $value;
+  }
+  .p-#{$step} {
+    padding: $value;
+  }
+
+  .mx-#{$step} {
+    margin-inline: $value;
+  }
+  .my-#{$step} {
+    margin-block: $value;
+  }
+  .px-#{$step} {
+    padding-inline: $value;
+  }
+  .py-#{$step} {
+    padding-block: $value;
+  }
+
+  @each $key, $side in $sides {
+    .m#{$key}-#{$step} {
+      margin-#{$side}: $value;
+    }
+    .p#{$key}-#{$step} {
+      padding-#{$side}: $value;
+    }
+  }
+}

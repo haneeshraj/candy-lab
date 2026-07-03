@@ -60,5 +60,13 @@ export default defineConfig(
       'no-restricted-imports': 'off'
     }
   },
+  // Tests: hooks are invoked inside `renderHook` callbacks, which the
+  // rules-of-hooks check flags; that's expected in the test harness.
+  {
+    files: ['src/tests/**/*.{ts,tsx}'],
+    rules: {
+      'react-hooks/rules-of-hooks': 'off'
+    }
+  },
   eslintConfigPrettier
 )

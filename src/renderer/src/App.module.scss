@@ -1,93 +1,80 @@
 @use 'abstracts' as *;
 
-// React & TypeScript brand gradient colors. These are third-party brand hues
-// used purely to render their logos/wordmarks — intentionally kept local and
-// out of the design palette. The raw-hex ban is disabled for this block only.
-/* stylelint-disable color-no-hex */
-$brand-react-from: #087ea4;
-$brand-react-to: #7c93ee;
-$brand-ts-from: #3178c6;
-$brand-ts-to: #f0dc4e;
-/* stylelint-enable color-no-hex */
+.home {
+  position: relative;
 
-.app {
-  @include flex(column, center, center);
+  @include flex-center;
 
-  flex: 1 1 auto;
-  min-height: 0;
-  padding: space(6);
+  min-height: calc(100vh - #{$titlebar-height});
+  overflow: hidden; // contain the blurred glow
+}
+
+// Soft brand-colored glow behind the content, slowly breathing.
+.glow {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+
+  @include size(rem(560px));
+
+  transform: translate(-50%, -50%);
+  border-radius: $radius-circle;
+  background: radial-gradient(circle, with-alpha($primary, 0.3), transparent 70%);
+  filter: blur(40px);
+  animation: glow-pulse ($duration-slow * 16) $ease-standard infinite;
+  pointer-events: none;
+}
+
+.content {
+  position: relative;
+  z-index: 1;
+
+  @include flex(column, center, center, space(4));
+
   text-align: center;
-  background-image: url('./assets/wavy-lines.svg');
-  background-size: cover;
 }
 
 .logo {
-  width: rem(128px);
-  height: rem(128px);
-  margin-bottom: space(5);
-  -webkit-user-drag: none;
-  will-change: filter;
-  transition: filter $duration-slow $ease-standard;
-
-  @include hover {
-    filter: drop-shadow(0 0 1.2em with-alpha($primary, 0.4));
-  }
+  color: $primary; // Logo fills via `currentColor`
 }
 
-.creator {
-  margin-bottom: space(2);
-  font-size: $font-size-sm;
-  font-weight: $font-weight-semibold;
-  color: $text-secondary;
-}
-
-.text {
-  margin: 0 space(2);
-  padding: space(4) 0;
-  font-size: $font-size-3xl;
+.title {
+  font-size: $font-size-4xl;
   font-weight: $font-weight-bold;
-  line-height: $line-height-tight;
-  color: $text-primary;
+  letter-spacing: $letter-spacing-tight;
+
+  // Shimmering gradient text: a wide gradient clipped to the glyphs, panned.
+  background: linear-gradient(90deg, $primary, $text-primary, $primary);
+  background-size: 200% auto;
+  background-clip: text;
+  color: transparent;
+  animation: gradient-pan ($duration-slow * 16) linear infinite;
 }
 
-.tip {
+.subtitle {
+  max-width: rem(420px);
   font-size: $font-size-md;
-  font-weight: $font-weight-semibold;
+  line-height: $line-height-normal;
   color: $text-secondary;
 }
 
-.react {
-  font-weight: $font-weight-bold;
-  background: linear-gradient(315deg, $brand-react-from 55%, $brand-react-to);
-  background-clip: text;
-  -webkit-text-fill-color: transparent;
-}
-
-.ts {
-  font-weight: $font-weight-bold;
-  background: linear-gradient(315deg, $brand-ts-from 45%, $brand-ts-to);
-  background-clip: text;
-  -webkit-text-fill-color: transparent;
-}
-
-.actions {
-  display: flex;
-  flex-wrap: wrap;
-  justify-content: center;
-  gap: space(3);
-  padding-top: space(8);
-}
-
-.action {
-  @include button-base;
-
-  color: $text-primary;
-  background-color: $surface;
-  border-color: $border;
+.badge {
+  display: inline-flex;
+  align-items: center;
+  gap: space(2);
+  padding: space(1) space(3);
+  font-size: $font-size-xs;
+  color: $text-secondary;
+  background: with-alpha($primary, 0.08);
+  border: $border-width solid with-alpha($primary, 0.25);
   border-radius: $radius-pill;
+}
 
-  @include hover {
-    border-color: $primary;
-    background-color: $surface-light;
-  }
+.dot {
+  @include size(rem(8px));
+
+  flex-shrink: 0;
+  border-radius: $radius-circle;
+  background: $primary;
+  animation: pulse ($duration-slow * 5) $ease-standard infinite;
 }

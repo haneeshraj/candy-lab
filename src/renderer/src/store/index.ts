@@ -18,4 +18,11 @@ export { useSettingsStore } from './settings/useSettingsStore'
 export type { SettingsState, SettingsActions, SettingsStore, ThemeMode } from './settings/types'
 
 export { useElectronStore } from './electron/useElectronStore'
-export type { ElectronState, ElectronActions, ElectronStore, UpdateStatus } from './electron/types'
+export type {
+  ElectronState,
+  ElectronActions,
+  ElectronStore,
+  UpdateStatus,
+  UpdateInfo,
+  AppInfo
+} from './electron/types'

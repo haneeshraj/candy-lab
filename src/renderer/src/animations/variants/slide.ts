@@ -7,10 +7,20 @@ import type { Variants } from 'motion/react'
 /** Distance the element travels, in pixels. */
 const offset = 16
 
+/** Short-travel distance for tight staggers (menu items, dense list rows). */
+const offsetSm = 6
+
 export const slideUp: Variants = {
   hidden: { opacity: 0, y: offset },
   visible: { opacity: 1, y: 0 },
   exit: { opacity: 0, y: offset }
+}
+
+/** Like `slideUp`, but a small nudge — for cascading items inside menus/lists. */
+export const slideUpSm: Variants = {
+  hidden: { opacity: 0, y: offsetSm },
+  visible: { opacity: 1, y: 0 },
+  exit: { opacity: 0, y: offsetSm }
 }
 
 export const slideDown: Variants = {

@@ -5,5 +5,9 @@ out
 .eslintcache
 *.log*
 
+# Secrets — tokens for publishing / update downloads. NEVER commit.
+.env
+.env.local
+
 # Local Claude Code tooling config
 .claude/

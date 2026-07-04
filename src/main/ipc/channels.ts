@@ -13,9 +13,16 @@ export const IPC_CHANNELS = {
   // App info
   APP_GET_VERSION: 'app:get-version', // invoke → string
   APP_GET_PLATFORM: 'app:get-platform', // invoke → Platform
+  APP_GET_INFO: 'app:get-info', // invoke → AppInfo
 
   // System / OS
   SYSTEM_OPEN_EXTERNAL: 'system:open-external', // invoke(url)
+
+  // Auto-updater
+  UPDATER_CHECK: 'updater:check', // invoke → void (kicks off a check)
+  UPDATER_INSTALL: 'updater:install', // send (quit & install a downloaded update)
+  UPDATER_GET_STATUS: 'updater:get-status', // invoke → UpdaterStatus (last known)
+  UPDATER_STATUS_CHANGED: 'updater:status-changed', // main → renderer
 
   // Settings
   SETTINGS_GET: 'settings:get', // invoke(key) → unknown

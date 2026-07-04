@@ -1,0 +1,65 @@
+@use 'abstracts' as *;
+
+// Full-viewport scrim that also centers the dialog.
+.backdrop {
+  @include flex-center;
+
+  position: fixed;
+  inset: 0;
+  z-index: z(modal);
+  padding: space(6);
+  background-color: $overlay;
+}
+
+.dialog {
+  display: flex;
+  flex-direction: column;
+  width: 100%;
+  max-width: rem(480px);
+  max-height: 100%;
+  background-color: $surface;
+  border: $border-width solid $border;
+  border-radius: $radius-lg;
+  box-shadow: $shadow-xl;
+  overflow: hidden;
+}
+
+.header {
+  @include flex-between;
+
+  gap: space(3);
+  padding: space(4) space(5);
+  border-bottom: $border-width solid $divider;
+}
+
+.title {
+  font-size: $font-size-lg;
+  font-weight: $font-weight-semibold;
+  color: $text-primary;
+}
+
+.close {
+  @include flex-center;
+  @include size($control-height-sm);
+
+  flex-shrink: 0;
+  color: $text-secondary;
+  background: transparent;
+  border: none;
+  border-radius: $radius-md;
+  cursor: pointer;
+  transition: $transition-colors;
+
+  @include hover {
+    background-color: $surface-light;
+    color: $text-primary;
+  }
+}
+
+// Placeholder content area — empty for now, ready for real content later.
+.body {
+  min-height: rem(80px);
+  padding: space(5);
+  overflow: auto;
+  color: $text-secondary;
+}

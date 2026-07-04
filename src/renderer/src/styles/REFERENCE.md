@@ -59,9 +59,28 @@ Defined in `abstracts/_colors.scss`.
 | `$palette-warning`     | `#D9A441` |
 | `$palette-error`       | `#B23A3A` |
 | `$palette-info`        | `#4A6D8C` |
-| `$palette-ink`         | `#160A0B` |
-| `$palette-ink-soft`    | `#21100F` |
-| `$palette-ink-mute`    | `#2C1817` |
+| `$palette-white`       | `#FFFFFF` |
+
+#### Neutral scales
+
+Two **monotone** ramps — pure neutral gray (R = G = B), no brand undertone.
+Deliberately independent of the ink/cream anchors so neutrals stay strictly
+achromatic. Direction is `darkest → lightest` (`-50` deepest, `-900` lightest),
+covering surfaces, borders, disabled states, and text. Palette only — map onto
+semantic tokens, don't use in components.
+
+| Dark ramp   | Hex       | Light ramp   | Hex       |
+| ----------- | --------- | ------------ | --------- |
+| `$dark-50`  | `#0A0A0A` | `$light-50`  | `#A6A6A6` |
+| `$dark-100` | `#121212` | `$light-100` | `#BDBDBD` |
+| `$dark-200` | `#1C1C1C` | `$light-200` | `#D1D1D1` |
+| `$dark-300` | `#262626` | `$light-300` | `#DEDEDE` |
+| `$dark-400` | `#333333` | `$light-400` | `#E8E8E8` |
+| `$dark-500` | `#454545` | `$light-500` | `#EFEFEF` |
+| `$dark-600` | `#5C5C5C` | `$light-600` | `#F4F4F4` |
+| `$dark-700` | `#7A7A7A` | `$light-700` | `#F8F8F8` |
+| `$dark-800` | `#A6A6A6` | `$light-800` | `#FBFBFB` |
+| `$dark-900` | `#EDEDED` | `$light-900` | `#FFFFFF` |
 
 ### Semantic tokens
 
@@ -97,15 +116,15 @@ Resolved per theme (`themes/_dark.scss`, `themes/_light.scss`).
 | `--color-primary-dark`   | `#9A6E32`         | `#C69953`             |
 | `--color-secondary`      | `#5D1B1E`         | `#5D1B1E`             |
 | `--color-secondary-dark` | `#3A1113`         | `#3A1113`             |
-| `--color-background`     | `#160A0B`         | `#EFE7D3`             |
-| `--color-surface`        | `#21100F`         | cream +4% lightness   |
-| `--color-surface-light`  | `#2C1817`         | `#FFFFFF`             |
+| `--color-background`     | `#121212`         | `#EFE7D3`             |
+| `--color-surface`        | `#1C1C1C`         | cream +4% lightness   |
+| `--color-surface-light`  | `#262626`         | `#FFFFFF`             |
 | `--color-text-primary`   | `#EFE7D3`         | `#3A1113`             |
 | `--color-text-secondary` | cream @ 64% alpha | dark-red @ 70% alpha  |
 | `--color-border`         | cream @ 12% alpha | dark-red @ 14% alpha  |
 | `--color-divider`        | cream @ 8% alpha  | dark-red @ 8% alpha   |
 | `--color-focus-ring`     | gold @ 60% alpha  | dark-gold @ 60% alpha |
-| `--color-overlay`        | ink @ 60% alpha   | dark-red @ 40% alpha  |
+| `--color-overlay`        | `$dark-50` @ 60%  | dark-red @ 40% alpha  |
 | `color-scheme`           | `dark`            | `light`               |
 
 Status colors (`success`/`warning`/`error`/`info`) are identical across themes.
@@ -120,7 +139,7 @@ Defined in `abstracts/_variables.scss`.
 
 | Variable            | Value                              |
 | ------------------- | ---------------------------------- |
-| `$font-sans`        | Inter → system UI sans stack       |
+| `$font-sans`        | Montserrat → system UI sans stack  |
 | `$font-mono`        | JetBrains Mono → system mono stack |
 | `$font-family-base` | `$font-sans`                       |
 | `$font-family-mono` | `$font-mono`                       |

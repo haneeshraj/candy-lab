@@ -1,14 +1,24 @@
 import { useCallback, useRef, useState } from 'react'
 import { useNavigate } from 'react-router-dom'
+import { AnimatePresence, motion } from 'motion/react'
+
+import { menuItem, menuPanel, motionSafePreset, useReducedMotionSafe } from '@renderer/animations'
 import { useOnClickOutside } from '@renderer/hooks'
-import { useElectronStore } from '@renderer/store'
+import { useElectronStore, useUIStore } from '@renderer/store'
 import { ROUTE_PATHS } from '../../router/routePaths'
-import logo from '../../assets/Logo.svg'
+import { Logo } from '../../assets/Logo'
+import { AppInfoContent } from '../AppInfo'
+import { Modal } from '../Modal'
+import { UpdaterContent } from '../Updater'
 import styles from './MenuBar.module.scss'
 
 // TODO: point these at your real repository.
 const ISSUES_URL = 'https://github.com/your-org/candy-lab/issues'
 const RELEASES_URL = 'https://github.com/your-org/candy-lab/releases'
+
+// Modal identifiers, keyed in the UI store's `openModals`.
+const MODAL_APP_INFO = 'app-info'
+const MODAL_CHECK_UPDATES = 'check-updates'
 
 interface MenuItem {
   label: string
@@ -34,10 +44,17 @@ export function MenuBar(): React.JSX.Element {
   const navigate = useNavigate()
 
   const updateStatus = useElectronStore((state) => state.updateStatus)
-  const setUpdateStatus = useElectronStore((state) => state.setUpdateStatus)
+
+  const openModals = useUIStore((state) => state.openModals)
+  const openModal = useUIStore((state) => state.openModal)
+  const closeModal = useUIStore((state) => state.closeModal)
 
   const close = useCallback((): void => setOpenId(null), [])
   useOnClickOutside(ref, close)
+
+  const reduced = useReducedMotionSafe()
+  const panelMotion = motionSafePreset(menuPanel, reduced)
+  const itemMotion = motionSafePreset(menuItem, reduced)
 
   const openExternal = (url: string): void => {
     void window.api.system.openExternal(url)
@@ -45,27 +62,31 @@ export function MenuBar(): React.JSX.Element {
 
   const menus: Menu[] = [
     {
-      id: 'help',
-      label: 'Help',
-      items: [
-        // TODO: open an App Info dialog.
-        { label: 'App Info', onSelect: () => undefined },
-        { label: 'Report Bug', onSelect: () => openExternal(ISSUES_URL) }
-      ]
-    },
-    {
       id: 'updates',
       label: 'Updates',
       items: [
-        // TODO: trigger a real update check over IPC once the updater is wired.
-        { label: 'Check for updates', onSelect: () => setUpdateStatus('checking') },
         {
-          label: 'Update available — download & install',
-          show: updateStatus === 'available',
-          // TODO: trigger download + install over IPC.
-          onSelect: () => setUpdateStatus('downloading')
+          label: 'Check for updates',
+          onSelect: () => {
+            void window.api.updater.check()
+            openModal(MODAL_CHECK_UPDATES)
+          }
+        },
+        {
+          // Updates download automatically; this appears once one is ready to install.
+          label: 'Restart to install update',
+          show: updateStatus === 'ready',
+          onSelect: () => window.api.updater.install()
         },
         { label: 'Release Notes', onSelect: () => openExternal(RELEASES_URL) }
+      ]
+    },
+    {
+      id: 'help',
+      label: 'Help',
+      items: [
+        { label: 'App Info', onSelect: () => openModal(MODAL_APP_INFO) },
+        { label: 'Report Bug', onSelect: () => openExternal(ISSUES_URL) }
       ]
     }
   ]
@@ -76,41 +97,67 @@ export function MenuBar(): React.JSX.Element {
   }
 
   return (
-    <div className={styles.menubar} ref={ref}>
-      <button
-        type="button"
-        className={styles.logo}
-        aria-label="Home"
-        onClick={() => navigate(ROUTE_PATHS.ROOT)}
+    <>
+      <div className={styles.menubar} ref={ref}>
+        <button
+          type="button"
+          className={styles.logo}
+          aria-label="Home"
+          onClick={() => navigate(ROUTE_PATHS.ROOT)}
+        >
+          <Logo width={20} height={20} />
+        </button>
+
+        {menus.map((menu) => (
+          <div key={menu.id} className={styles.menu}>
+            <button
+              type="button"
+              className={styles.trigger}
+              onClick={() => setOpenId((current) => (current === menu.id ? null : menu.id))}
+            >
+              {menu.label}
+            </button>
+
+            <AnimatePresence>
+              {openId === menu.id && (
+                <motion.ul className={styles.dropdown} {...panelMotion}>
+                  {menu.items
+                    .filter((item) => item.show !== false)
+                    .map((item) => (
+                      // Only `variants`/`transition` — the items inherit their
+                      // hidden→visible→exit state from the panel, so its
+                      // `staggerChildren` / `delayChildren` actually cascade.
+                      <motion.li
+                        key={item.label}
+                        variants={itemMotion.variants}
+                        transition={itemMotion.transition}
+                      >
+                        <button type="button" className={styles.item} onClick={() => select(item)}>
+                          {item.label}
+                        </button>
+                      </motion.li>
+                    ))}
+                </motion.ul>
+              )}
+            </AnimatePresence>
+          </div>
+        ))}
+      </div>
+
+      <Modal
+        isOpen={openModals.includes(MODAL_APP_INFO)}
+        onClose={() => closeModal(MODAL_APP_INFO)}
+        title="App Info"
       >
-        <img src={logo} width={20} height={20} alt="" />
-      </button>
-
-      {menus.map((menu) => (
-        <div key={menu.id} className={styles.menu}>
-          <button
-            type="button"
-            className={styles.trigger}
-            onClick={() => setOpenId((current) => (current === menu.id ? null : menu.id))}
-          >
-            {menu.label}
-          </button>
-
-          {openId === menu.id && (
-            <ul className={styles.dropdown}>
-              {menu.items
-                .filter((item) => item.show !== false)
-                .map((item) => (
-                  <li key={item.label}>
-                    <button type="button" className={styles.item} onClick={() => select(item)}>
-                      {item.label}
-                    </button>
-                  </li>
-                ))}
-            </ul>
-          )}
-        </div>
-      ))}
-    </div>
+        <AppInfoContent />
+      </Modal>
+      <Modal
+        isOpen={openModals.includes(MODAL_CHECK_UPDATES)}
+        onClose={() => closeModal(MODAL_CHECK_UPDATES)}
+        title="Check for updates"
+      >
+        <UpdaterContent />
+      </Modal>
+    </>
   )
 }

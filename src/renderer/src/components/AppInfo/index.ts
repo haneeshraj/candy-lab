@@ -1,0 +1,1 @@
+export { AppInfoContent } from './AppInfoContent'

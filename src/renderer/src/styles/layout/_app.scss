@@ -26,8 +26,16 @@ body,
   min-height: 0;
 }
 
+// Row below the title bar: sidebar rail + routed content beside it.
+.app-main {
+  display: flex;
+  flex: 1 1 auto;
+  min-height: 0;
+}
+
 .app-body {
   flex: 1 1 auto;
+  min-width: 0; // let content shrink instead of overflowing the row
   min-height: 0;
   overflow: auto;
 }

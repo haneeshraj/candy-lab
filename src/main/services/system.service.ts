@@ -1,4 +1,5 @@
 import { app, shell } from 'electron'
+import type { AppInfo } from '../../preload/ipc/types'
 
 // OS / app-level integrations. Input from the renderer is UNTRUSTED, so this
 // layer re-validates (defense in depth) even though the preload also sanitizes.
@@ -24,4 +25,9 @@ function getPlatform(): NodeJS.Platform {
   return process.platform
 }
 
-export const systemService = { openExternal, getVersion, getPlatform }
+// Build-time metadata injected via Vite `define` (see electron.vite.config.ts).
+function getInfo(): AppInfo {
+  return __APP_INFO__
+}
+
+export const systemService = { openExternal, getVersion, getPlatform, getInfo }

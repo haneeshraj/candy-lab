@@ -7,7 +7,8 @@
   align-items: center;
   flex-shrink: 0;
   height: $titlebar-height;
-  background-color: $surface;
+
+  // background-color: $surface;
   user-select: none;
   -webkit-app-region: drag; // whole bar drags the window
 }

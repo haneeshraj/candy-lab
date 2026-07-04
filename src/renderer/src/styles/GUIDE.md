@@ -297,6 +297,11 @@ repeatedly, promote it to a component module class.
 | `$palette-gold`        | `#C69953` |
 | `$palette-light-cream` | `#EFE7D3` |
 
+Two monotone gray ramps (`$dark-50…900`, `$light-50…900`, darkest→lightest,
+R = G = B) provide brand-independent neutrals for surface/border/text steps. See
+REFERENCE.md for the full table and recommended semantic mappings. Palette only
+— never use in components.
+
 **Semantic tokens** (use _these_ in components): `$primary`, `$primary-dark`,
 `$secondary`, `$secondary-dark`, `$background`, `$surface`, `$surface-light`,
 `$text-primary`, `$text-secondary`, `$border`, `$divider`, `$success`,

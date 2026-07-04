@@ -3,6 +3,7 @@ import { electronApp, optimizer } from '@electron-toolkit/utils'
 import { APP_CONFIG } from './config'
 import { registerAppSecurity } from './events'
 import { registerIpc } from '../ipc/registerIpc'
+import { initUpdater } from '../services/updater.service'
 import { createMainWindow } from '../windows/createMainWindow'
 import { createSplashWindow } from '../windows/createSplashWindow'
 import { logger } from '../utils/logger'
@@ -25,6 +26,7 @@ function onReady(): void {
   registerAppSecurity()
   registerIpc()
   openWindows()
+  initUpdater() // wires events + kicks off the automatic check (packaged builds only)
 
   // macOS: recreate a window when the dock icon is clicked and none are open.
   app.on('activate', () => {

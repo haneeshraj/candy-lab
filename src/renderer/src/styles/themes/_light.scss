@@ -16,17 +16,17 @@
   --color-secondary-dark: #{$palette-dark-red};
 
   // Surfaces
-  --color-background: #{$palette-light-cream};
-  --color-surface: #{color.adjust($palette-light-cream, $lightness: 4%)};
-  --color-surface-light: #{$palette-white};
+  --color-background: #{$light-500};
+  --color-surface: #{$light-600};
+  --color-surface-light: #{$light-900};
 
   // Text
-  --color-text-primary: #{$palette-dark-red};
-  --color-text-secondary: #{color.change($palette-dark-red, $alpha: 0.7)};
+  --color-text-primary: #{$dark-100};
+  --color-text-secondary: #{$dark-600};
 
   // Lines
-  --color-border: #{color.change($palette-dark-red, $alpha: 0.14)};
-  --color-divider: #{color.change($palette-dark-red, $alpha: 0.08)};
+  --color-border: #{color.change($dark-100, $alpha: 0.14)};
+  --color-divider: #{color.change($dark-100, $alpha: 0.08)};
 
   // Status
   --color-success: #{$palette-success};
@@ -36,7 +36,7 @@
 
   // Interaction
   --color-focus-ring: #{color.change($palette-dark-gold, $alpha: 0.6)};
-  --color-overlay: #{color.change($palette-dark-red, $alpha: 0.4)};
+  --color-overlay: #{color.change($dark-100, $alpha: 0.4)};
 
   // Elevation, tuned for light surfaces
   --shadow-sm: 0 1px 2px rgb(58 17 19 / 10%);

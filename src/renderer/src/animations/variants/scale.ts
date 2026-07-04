@@ -15,3 +15,14 @@ export const scaleIn: Variants = {
   visible: { opacity: 1, scale: 1 },
   exit: { opacity: 0, scale: 0.9 }
 }
+
+/**
+ * Unfurls vertically from the top edge — pair with `transform-origin: top` in
+ * CSS so it grows downward out of its trigger. Scale-only (no fade): good for
+ * menus / popovers whose contents animate in separately.
+ */
+export const scaleYTop: Variants = {
+  hidden: { scaleY: 0 },
+  visible: { scaleY: 1 },
+  exit: { scaleY: 0 }
+}

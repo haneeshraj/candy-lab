@@ -70,7 +70,11 @@ import { listContainer, listItem } from '@renderer/animations'
 
 ;<motion.ul {...listContainer}>
   {rows.map((row) => (
-    <motion.li key={row.id} {...listItem} />
+    // Pass ONLY `variants`/`transition` to staggered children — never their own
+    // `initial`/`animate`/`exit`. The container's `animate` state propagates
+    // down, and that propagation is what its `staggerChildren` drives. A child
+    // that sets its own `animate` opts out of orchestration and won't stagger.
+    <motion.li key={row.id} variants={listItem.variants} transition={listItem.transition} />
   ))}
 </motion.ul>
 ```
@@ -180,3 +184,6 @@ Usage: `<motion.div {...toast} />`.
 - ❌ Animating layout properties (`width`, `top`, `margin`) — use `x`/`y`/`scale`.
 - ❌ Hardcoding easing/duration numbers — reference the `transitions` tokens.
 - ❌ Adding `@keyframes` here — those are global CSS (see `styles/`), not motion variants.
+- ❌ Spreading a full preset (`{...listItem}`) onto **staggered children** — the
+  preset's `initial`/`animate`/`exit` make the child animate on its own and
+  ignore the container's `staggerChildren`. Pass only `variants`/`transition`.

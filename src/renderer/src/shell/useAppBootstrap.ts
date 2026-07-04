@@ -12,13 +12,15 @@ export function useAppBootstrap(): void {
 
     const load = async (): Promise<void> => {
       try {
-        const [version, platform] = await Promise.all([
+        const [version, platform, appInfo] = await Promise.all([
           window.api.app.getVersion(),
-          window.api.app.getPlatform()
+          window.api.app.getPlatform(),
+          window.api.app.getInfo()
         ])
         if (cancelled) return
         useElectronStore.getState().setVersion(version)
         useElectronStore.getState().setPlatform(platform)
+        useElectronStore.getState().setAppInfo(appInfo)
         useAppStore.getState().setInitialized(true)
       } catch (error) {
         if (!cancelled) useAppStore.getState().setBootError(String(error))

@@ -1,14 +1,24 @@
 import { Suspense } from 'react'
 import { Route, Routes } from 'react-router-dom'
+import { PageLayout } from '../components/PageLayout'
 import { routes, type AppRoute } from './routes'
 import { RouteGuard } from './RouteGuard'
 
 // Map the declarative route table to react-router elements. Every element is
-// wrapped in RouteGuard so protection logic has a single future home. Recurses
-// into `children` so nested routes work without restructuring.
+// wrapped in RouteGuard (protection logic's single future home) and PageLayout
+// (the shared page frame), so pages get both without opting in. Recurses into
+// `children` so nested routes work without restructuring.
 function renderRoutes(list: AppRoute[]): React.ReactNode {
   return list.map((route) => (
-    <Route key={route.path} path={route.path} element={<RouteGuard>{route.element}</RouteGuard>}>
+    <Route
+      key={route.path}
+      path={route.path}
+      element={
+        <RouteGuard>
+          <PageLayout>{route.element}</PageLayout>
+        </RouteGuard>
+      }
+    >
       {route.children ? renderRoutes(route.children) : null}
     </Route>
   ))

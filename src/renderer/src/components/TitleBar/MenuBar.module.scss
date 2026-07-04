@@ -3,67 +3,79 @@
 // Minimal boilerplate — restyle freely.
 
 .menubar {
-  display: flex;
+  @include flex-center;
+
+  gap: space(1);
   height: 100%;
   padding-left: rem(2px); // small gap before the logo
   -webkit-app-region: no-drag; // menu must be clickable, not draggable
 }
 
 .logo {
-  display: flex;
-  align-items: center;
+  @include flex-center;
+
   padding: 0 space(2);
+  color: $text-primary; // drives the logo fill via `currentColor`; follows the theme
   background: transparent;
   border: none;
   cursor: pointer;
 
-  img {
+  svg {
     display: block;
   }
 }
 
 .menu {
   position: relative;
+
+  @include flex-center;
 }
 
 .trigger {
-  height: 100%;
-  padding: 0 space(3);
-  font-size: $font-size-xs;
+  padding: space(1) space(2);
+  border-radius: $radius-sm;
+  font-size: $font-size-xxs;
   color: $text-secondary;
   background: transparent;
   border: none;
   cursor: pointer;
+  transition: $transition-colors;
 
   &:hover {
-    color: $text-primary;
+    background-color: $surface-light;
   }
 }
 
 .dropdown {
   position: absolute;
-  top: 100%;
+  top: calc(100% + rem(10px));
   left: 0;
   z-index: z(dropdown);
-  min-width: rem(180px);
-  padding: space(1) 0;
+  min-width: max-content;
+  padding: space(2);
   list-style: none;
   background-color: $surface;
   border: $border-width solid $border;
   border-radius: $radius-md;
   box-shadow: $shadow-md;
+  transform-origin: top; // scale-in animation grows downward from the trigger
+  display: flex;
+  flex-direction: column;
+  gap: space(1);
 }
 
 .item {
   display: block;
   width: 100%;
-  padding: space(2) space(3);
-  font-size: $font-size-xs;
+  padding: space(1) space(2);
+  font-size: $font-size-xxs;
   text-align: left;
   color: $text-primary;
   background: transparent;
   border: none;
   cursor: pointer;
+  border-radius: $radius-sm;
+  transition: $transition-colors;
 
   &:hover {
     background-color: $surface-light;

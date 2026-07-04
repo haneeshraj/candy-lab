@@ -18,11 +18,41 @@ $palette-warning: #d9a441;
 $palette-error: #b23a3a;
 $palette-info: #4a6d8c;
 
-// --- Neutral anchors for dark UI surfaces ----------------------------------
-$palette-ink: #160a0b; // near-black with a red undertone
-$palette-ink-soft: #21100f;
-$palette-ink-mute: #2c1817;
-$palette-white: #fff;
+// --- Neutral scales --------------------------------------------------------
+// Two perceptually-smooth MONOTONE ramps — pure neutral gray (R = G = B), with
+// no brand undertone. Intentionally independent of the ink/cream anchors so
+// neutrals stay strictly achromatic no matter how the warm brand palette above
+// evolves. Steps cover surfaces, borders, disabled states, and text.
+//
+// Direction: DARKEST → LIGHTEST — `-50` is the deepest shade, `-900` the
+// lightest.
+//
+// Palette entries only. Do NOT reference these directly in components — map
+// them onto the semantic tokens / theme variables (see mapping notes below).
+
+// Dark ramp — dark-theme neutrals (near-black → near-white).
+$dark-50: #0a0a0a; //   app backdrop / behind-everything (deepest)
+$dark-100: #121212; //  base background            → --color-background
+$dark-200: #1c1c1c; //  base surface (cards, menus)→ --color-surface
+$dark-300: #262626; //  raised surface             → --color-surface-light
+$dark-400: #333; //     elevated surface / hover (popovers, dropdowns)
+$dark-500: #454545; //  strong borders, section dividers
+$dark-600: #5c5c5c; //  subtle borders, disabled backgrounds
+$dark-700: #7a7a7a; //  disabled text, muted icons
+$dark-800: #a6a6a6; //  secondary / subtle text    → --color-text-secondary
+$dark-900: #ededed; //  primary / high-contrast text → --color-text-primary
+
+// Light ramp — light-theme neutrals (mid gray → white).
+$light-50: #a6a6a6; //  strongest border / low-contrast line on light
+$light-100: #bdbdbd; // strong borders
+$light-200: #d1d1d1; // subtle borders, dividers
+$light-300: #dedede; // disabled backgrounds, hairlines
+$light-400: #e8e8e8; // raised / hover surface
+$light-500: #efefef; // base background            → --color-background
+$light-600: #f4f4f4; // base surface (cards, menus)→ --color-surface
+$light-700: #f8f8f8; // elevated surface (popovers, dropdowns)
+$light-800: #fbfbfb; // highest surface
+$light-900: #fff; //    pure highlight / white     → --color-surface-light
 
 // ===========================================================================
 // Semantic tokens

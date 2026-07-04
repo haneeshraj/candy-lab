@@ -1,0 +1,55 @@
+@use 'abstracts' as *;
+
+.root {
+  @include flex(column, $gap: space(4));
+}
+
+.status {
+  font-size: $font-size-sm;
+  color: $text-secondary;
+}
+
+.bar {
+  width: 100%;
+  height: rem(6px);
+  overflow: hidden;
+  background-color: $surface-light;
+  border-radius: $radius-pill;
+}
+
+.fill {
+  height: 100%;
+  background-color: $primary;
+  border-radius: inherit;
+  transition: width $duration-normal $ease-standard;
+}
+
+.actions {
+  display: flex;
+  gap: space(3);
+}
+
+.button {
+  @include button-base;
+
+  color: $text-primary;
+  background-color: $surface;
+  border-color: $border;
+  border-radius: $radius-pill;
+
+  @include hover {
+    background-color: $surface-light;
+    border-color: $primary;
+  }
+}
+
+.primary {
+  color: $background;
+  background-color: $primary;
+  border-color: $primary;
+
+  @include hover {
+    background-color: $primary-dark;
+    border-color: $primary-dark;
+  }
+}

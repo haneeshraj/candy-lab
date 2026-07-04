@@ -39,5 +39,8 @@ appImage:
   artifactName: ${name}-${version}.${ext}
 npmRebuild: false
 publish:
-  provider: generic
-  url: https://example.com/auto-updates
+  provider: github
+  owner: haneeshraj
+  repo: candy-lab
+  private: true # authenticate downloads (client uses the baked-in read-only token)
+  releaseType: release # publish live immediately (not a draft the client can't see)

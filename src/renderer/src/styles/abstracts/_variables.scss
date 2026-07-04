@@ -7,7 +7,7 @@
 
 // --- Typography ------------------------------------------------------------
 $font-sans:
-  'Inter',
+  'Montserrat',
   -apple-system,
   BlinkMacSystemFont,
   'Segoe UI',
@@ -28,6 +28,8 @@ $font-family-mono: $font-mono;
 // Applied to <html>. 62.5% of the 16px browser default = 10px, making 1rem =
 // 10px. Keep in sync with `functions.$root-font-size` (the rem() divisor).
 $font-size-root: 62.5%;
+$font-size-xxxs: rem(8px);
+$font-size-xxs: rem(10px);
 $font-size-xs: rem(12px);
 $font-size-sm: rem(14px);
 $font-size-md: rem(16px);
@@ -55,6 +57,7 @@ $letter-spacing-wider: 0.06em;
 // both read from it so the scale can never drift.
 $spacing: (
   0: 0,
+  point5: rem(1px),
   1: rem(4px),
   2: rem(8px),
   3: rem(12px),
@@ -117,7 +120,7 @@ $transition-colors:
 $layout-max-width: 1280px;
 $layout-content-width: 960px;
 $layout-narrow-width: 640px;
-$titlebar-height: rem(36px);
+$titlebar-height: rem(40px);
 $control-height: rem(38px);
 $control-height-sm: rem(30px);
 $control-height-lg: rem(46px);

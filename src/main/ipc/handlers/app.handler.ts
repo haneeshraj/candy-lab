@@ -8,4 +8,5 @@ import { systemService } from '../../services/system.service'
 export function registerAppHandlers(): void {
   ipcMain.handle(IPC_CHANNELS.APP_GET_VERSION, () => systemService.getVersion())
   ipcMain.handle(IPC_CHANNELS.APP_GET_PLATFORM, () => systemService.getPlatform())
+  ipcMain.handle(IPC_CHANNELS.APP_GET_INFO, () => systemService.getInfo())
 }

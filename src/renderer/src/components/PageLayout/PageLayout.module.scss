@@ -1,0 +1,13 @@
+@use 'abstracts' as *;
+
+// Shared frame for every routed page: a fixed gap from the sidebar rail and at
+// least the full remaining viewport height (window minus the title bar).
+.page {
+  min-height: calc(100vh - #{$titlebar-height});
+
+  // `margin` (not padding) so the gap sits OUTSIDE the panel's background —
+  // an empty 30px strip between the sidebar and the surface, not a colored inset.
+  margin-left: rem(16px);
+  background-color: $surface;
+  border-radius: $radius-lg 0 0 0; // round the top corners, but not the bottom
+}

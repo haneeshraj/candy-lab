@@ -43,4 +43,5 @@ publish:
   owner: haneeshraj
   repo: candy-lab
   private: true # authenticate downloads (client uses the baked-in read-only token)
-  releaseType: release # publish live immediately (not a draft the client can't see)
+  releaseType: draft # upload to a draft; you publish it yourself in the GitHub UI
+

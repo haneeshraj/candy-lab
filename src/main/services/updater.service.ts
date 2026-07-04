@@ -2,10 +2,14 @@ import { app, BrowserWindow } from 'electron'
 import electronUpdater from 'electron-updater'
 import { IPC_CHANNELS } from '../ipc/channels'
 import { logger } from '../utils/logger'
-import type { UpdaterStatus } from '../../preload/ipc/types'
+import type { ReleaseInfo, UpdaterStatus } from '../../preload/ipc/types'
 
 // `electron-updater` is CommonJS; grab the singleton off the default export.
 const { autoUpdater } = electronUpdater
+
+// Repository the app updates from — must match `publish` in electron-builder.yml.
+const GITHUB_OWNER = 'haneeshraj'
+const GITHUB_REPO = 'candy-lab'
 
 // Last status is cached so a renderer that mounts after an event still gets it
 // (via `getUpdaterStatus` / the `updater:get-status` channel).
@@ -38,6 +42,50 @@ export async function checkForUpdates(): Promise<void> {
 
 export function quitAndInstall(): void {
   autoUpdater.quitAndInstall()
+}
+
+// Minimal shape of the GitHub "latest release" response we consume.
+interface GithubReleaseResponse {
+  tag_name?: string
+  name?: string | null
+  body?: string | null
+  html_url?: string
+  published_at?: string
+}
+
+/**
+ * Fetch the latest published release from GitHub for the "Release Notes" dialog.
+ * Uses the baked-in read-only token to reach the private repo. Returns `null` if
+ * the request fails (offline, no token in dev, no releases yet).
+ */
+export async function getLatestRelease(): Promise<ReleaseInfo | null> {
+  const headers: Record<string, string> = {
+    Accept: 'application/vnd.github+json',
+    'User-Agent': 'candy-lab'
+  }
+  if (__UPDATE_TOKEN__) headers.Authorization = `token ${__UPDATE_TOKEN__}`
+
+  try {
+    const res = await fetch(
+      `https://api.github.com/repos/${GITHUB_OWNER}/${GITHUB_REPO}/releases/latest`,
+      { headers }
+    )
+    if (!res.ok) {
+      logger.warn(`Fetch latest release failed: HTTP ${res.status}`)
+      return null
+    }
+    const data = (await res.json()) as GithubReleaseResponse
+    return {
+      version: data.tag_name ?? '',
+      name: data.name ?? data.tag_name ?? '',
+      notes: data.body ?? '',
+      url: data.html_url ?? '',
+      publishedAt: data.published_at ?? ''
+    }
+  } catch (error) {
+    logger.error('Fetch latest release errored', error)
+    return null
+  }
 }
 
 /**

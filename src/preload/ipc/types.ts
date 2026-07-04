@@ -65,6 +65,20 @@ export interface UpdaterStatus {
   error?: string | null
 }
 
+/** Details of a GitHub release, for the "Release Notes" dialog. */
+export interface ReleaseInfo {
+  /** Tag, e.g. `v1.0.0`. */
+  version: string
+  /** Release title. */
+  name: string
+  /** Release body, in Markdown. */
+  notes: string
+  /** Link to the release on GitHub. */
+  url: string
+  /** ISO timestamp the release was published. */
+  publishedAt: string
+}
+
 export interface UpdaterApi {
   /** Trigger a check now (no-op in unpackaged dev builds). */
   check: () => Promise<void>
@@ -74,6 +88,8 @@ export interface UpdaterApi {
   getStatus: () => Promise<UpdaterStatus>
   /** Subscribe to status changes; returns an unsubscribe function. */
   onStatusChange: (callback: (status: UpdaterStatus) => void) => () => void
+  /** Fetch the latest published release from GitHub (`null` if unavailable). */
+  getLatestRelease: () => Promise<ReleaseInfo | null>
 }
 
 /** The complete API surface exposed to the renderer. */

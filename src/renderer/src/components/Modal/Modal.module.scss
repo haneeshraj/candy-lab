@@ -22,6 +22,10 @@
   border-radius: $radius-lg;
   box-shadow: $shadow-xl;
   overflow: hidden;
+
+  &.lg {
+    max-width: rem(640px);
+  }
 }
 
 .header {

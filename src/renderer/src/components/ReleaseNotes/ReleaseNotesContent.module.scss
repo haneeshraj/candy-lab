@@ -1,0 +1,123 @@
+@use 'abstracts' as *;
+
+.root {
+  @include flex(column, $gap: space(4));
+}
+
+.header {
+  display: flex;
+  align-items: baseline;
+  gap: space(3);
+  padding-bottom: space(3);
+  border-bottom: $border-width solid $divider;
+}
+
+.version {
+  font-size: $font-size-xl;
+  font-weight: $font-weight-bold;
+  color: $text-primary;
+}
+
+.date {
+  font-size: $font-size-xs;
+  color: $text-secondary;
+}
+
+.muted {
+  font-size: $font-size-sm;
+  color: $text-secondary;
+}
+
+// Rendered Markdown from the release body. Bare tag selectors are fine in a
+// module — only class names get hashed.
+.notes {
+  font-size: $font-size-sm;
+  line-height: $line-height-normal;
+  color: $text-secondary;
+
+  h1,
+  h2,
+  h3 {
+    margin: space(4) 0 space(2);
+    font-weight: $font-weight-semibold;
+    color: $text-primary;
+  }
+
+  h1 {
+    font-size: $font-size-lg;
+  }
+
+  h2 {
+    font-size: $font-size-md;
+  }
+
+  h3 {
+    font-size: $font-size-sm;
+  }
+
+  p {
+    margin: space(2) 0;
+  }
+
+  ul,
+  ol {
+    margin: space(2) 0;
+    padding-left: space(5);
+  }
+
+  li {
+    margin: space(1) 0;
+  }
+
+  a {
+    color: $primary;
+    text-decoration: underline;
+  }
+
+  strong {
+    font-weight: $font-weight-semibold;
+    color: $text-primary;
+  }
+
+  blockquote {
+    margin: space(3) 0;
+    padding: space(2) space(3);
+    background: with-alpha($primary, 0.08);
+    border-left: rem(3px) solid $primary;
+    border-radius: $radius-sm;
+  }
+
+  code {
+    padding: 0 space(1);
+    font-family: $font-mono;
+    font-size: 0.9em;
+    background: $surface-light;
+    border-radius: $radius-sm;
+  }
+
+  hr {
+    margin: space(4) 0;
+    border: 0;
+    border-top: $border-width solid $divider;
+  }
+
+  & > :first-child {
+    margin-top: 0;
+  }
+
+  & > :last-child {
+    margin-bottom: 0;
+  }
+}
+
+.link {
+  align-self: flex-start;
+  font-size: $font-size-sm;
+  font-weight: $font-weight-medium;
+  color: $primary;
+  text-decoration: none;
+
+  @include hover {
+    text-decoration: underline;
+  }
+}

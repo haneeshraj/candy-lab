@@ -15,6 +15,8 @@ interface ModalProps {
   isOpen: boolean
   onClose: () => void
   title?: string
+  /** Dialog width. `md` (default, ~480px) or `lg` (~640px) for long content. */
+  size?: 'md' | 'lg'
   children?: React.ReactNode
 }
 
@@ -24,7 +26,13 @@ interface ModalProps {
  * Closes on backdrop click, the close button, or Escape. Presentational only:
  * the caller owns the open state (see `MenuBar` for wiring via the UI store).
  */
-export function Modal({ isOpen, onClose, title, children }: ModalProps): React.JSX.Element {
+export function Modal({
+  isOpen,
+  onClose,
+  title,
+  size = 'md',
+  children
+}: ModalProps): React.JSX.Element {
   const reduced = useReducedMotionSafe()
 
   // Close on Escape while open.
@@ -49,7 +57,7 @@ export function Modal({ isOpen, onClose, title, children }: ModalProps): React.J
             role="dialog"
             aria-modal="true"
             aria-label={title}
-            className={styles.dialog}
+            className={`${styles.dialog} ${size === 'lg' ? styles.lg : ''}`}
             onClick={(event) => event.stopPropagation()} // clicks inside never close
             {...motionSafePreset(modalContent, reduced)}
           >

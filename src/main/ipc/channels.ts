@@ -23,6 +23,7 @@ export const IPC_CHANNELS = {
   UPDATER_INSTALL: 'updater:install', // send (quit & install a downloaded update)
   UPDATER_GET_STATUS: 'updater:get-status', // invoke → UpdaterStatus (last known)
   UPDATER_STATUS_CHANGED: 'updater:status-changed', // main → renderer
+  UPDATER_GET_LATEST_RELEASE: 'updater:get-latest-release', // invoke → ReleaseInfo | null
 
   // Settings
   SETTINGS_GET: 'settings:get', // invoke(key) → unknown

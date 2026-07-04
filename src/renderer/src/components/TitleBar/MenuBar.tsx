@@ -9,16 +9,17 @@ import { ROUTE_PATHS } from '../../router/routePaths'
 import { Logo } from '../../assets/Logo'
 import { AppInfoContent } from '../AppInfo'
 import { Modal } from '../Modal'
+import { ReleaseNotesContent } from '../ReleaseNotes'
 import { UpdaterContent } from '../Updater'
 import styles from './MenuBar.module.scss'
 
-// TODO: point these at your real repository.
+// TODO: point this at your real repository.
 const ISSUES_URL = 'https://github.com/your-org/candy-lab/issues'
-const RELEASES_URL = 'https://github.com/your-org/candy-lab/releases'
 
 // Modal identifiers, keyed in the UI store's `openModals`.
 const MODAL_APP_INFO = 'app-info'
 const MODAL_CHECK_UPDATES = 'check-updates'
+const MODAL_RELEASE_NOTES = 'release-notes'
 
 interface MenuItem {
   label: string
@@ -78,7 +79,7 @@ export function MenuBar(): React.JSX.Element {
           show: updateStatus === 'ready',
           onSelect: () => window.api.updater.install()
         },
-        { label: 'Release Notes', onSelect: () => openExternal(RELEASES_URL) }
+        { label: 'Release Notes', onSelect: () => openModal(MODAL_RELEASE_NOTES) }
       ]
     },
     {
@@ -157,6 +158,14 @@ export function MenuBar(): React.JSX.Element {
         title="Check for updates"
       >
         <UpdaterContent />
+      </Modal>
+      <Modal
+        isOpen={openModals.includes(MODAL_RELEASE_NOTES)}
+        onClose={() => closeModal(MODAL_RELEASE_NOTES)}
+        title="Release Notes"
+        size="lg"
+      >
+        <ReleaseNotesContent />
       </Modal>
     </>
   )

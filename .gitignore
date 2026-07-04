@@ -9,5 +9,9 @@ out
 .env
 .env.local
 
+# Code-signing certificates (private key). NEVER commit.
+certs/
+*.pfx
+
 # Local Claude Code tooling config
 .claude/

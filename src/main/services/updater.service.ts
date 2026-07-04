@@ -98,10 +98,12 @@ export function initUpdater(): void {
   autoUpdater.autoInstallOnAppQuit = true
   autoUpdater.logger = logger
 
-  // Private repo: authenticate every request with the baked-in read-only token
-  // so the client can reach the release feed + assets without any user setup.
+  // Private repo: electron-updater only selects its authenticated provider (which
+  // pulls latest.yml + the installer from the GitHub *API* asset URLs) when a
+  // token is exposed via GH_TOKEN/GITHUB_TOKEN — `requestHeaders` is NOT enough.
+  // Hand it the baked read-only token so update checks authenticate.
   if (__UPDATE_TOKEN__) {
-    autoUpdater.requestHeaders = { authorization: `token ${__UPDATE_TOKEN__}` }
+    process.env.GH_TOKEN = __UPDATE_TOKEN__
   }
 
   autoUpdater.on('checking-for-update', () => broadcast({ status: 'checking' }))

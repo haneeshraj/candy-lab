@@ -4,7 +4,7 @@ import { AnimatePresence, motion } from 'motion/react'
 
 import { menuItem, menuPanel, motionSafePreset, useReducedMotionSafe } from '@renderer/animations'
 import { useOnClickOutside } from '@renderer/hooks'
-import { useElectronStore, useUIStore } from '@renderer/store'
+import { selectAuthPhase, useAuthStore, useElectronStore, useUIStore } from '@renderer/store'
 import { ROUTE_PATHS } from '../../router/routePaths'
 import { Logo } from '../../assets/Logo'
 import { AppInfoContent } from '../AppInfo'
@@ -32,6 +32,7 @@ interface Menu {
   id: string
   label: string
   items: MenuItem[]
+  show?: boolean
 }
 
 /**
@@ -44,6 +45,7 @@ export function MenuBar(): React.JSX.Element {
   const ref = useRef<HTMLDivElement>(null)
   const navigate = useNavigate()
 
+  const authPhase = useAuthStore(selectAuthPhase)
   const updateStatus = useElectronStore((state) => state.updateStatus)
 
   const openModals = useUIStore((state) => state.openModals)
@@ -83,6 +85,19 @@ export function MenuBar(): React.JSX.Element {
       ]
     },
     {
+      id: 'user',
+      label: 'User',
+      show: authPhase !== 'signed-out',
+      items: [
+        {
+          label: 'Sign out',
+          onSelect: () => {
+            void window.api.auth.signOut()
+          }
+        }
+      ]
+    },
+    {
       id: 'help',
       label: 'Help',
       items: [
@@ -109,40 +124,46 @@ export function MenuBar(): React.JSX.Element {
           <Logo width={20} height={20} />
         </button>
 
-        {menus.map((menu) => (
-          <div key={menu.id} className={styles.menu}>
-            <button
-              type="button"
-              className={styles.trigger}
-              onClick={() => setOpenId((current) => (current === menu.id ? null : menu.id))}
-            >
-              {menu.label}
-            </button>
+        {menus
+          .filter((menu) => menu.show !== false)
+          .map((menu) => (
+            <div key={menu.id} className={styles.menu}>
+              <button
+                type="button"
+                className={styles.trigger}
+                onClick={() => setOpenId((current) => (current === menu.id ? null : menu.id))}
+              >
+                {menu.label}
+              </button>
 
-            <AnimatePresence>
-              {openId === menu.id && (
-                <motion.ul className={styles.dropdown} {...panelMotion}>
-                  {menu.items
-                    .filter((item) => item.show !== false)
-                    .map((item) => (
-                      // Only `variants`/`transition` — the items inherit their
-                      // hidden→visible→exit state from the panel, so its
-                      // `staggerChildren` / `delayChildren` actually cascade.
-                      <motion.li
-                        key={item.label}
-                        variants={itemMotion.variants}
-                        transition={itemMotion.transition}
-                      >
-                        <button type="button" className={styles.item} onClick={() => select(item)}>
-                          {item.label}
-                        </button>
-                      </motion.li>
-                    ))}
-                </motion.ul>
-              )}
-            </AnimatePresence>
-          </div>
-        ))}
+              <AnimatePresence>
+                {openId === menu.id && (
+                  <motion.ul className={styles.dropdown} {...panelMotion}>
+                    {menu.items
+                      .filter((item) => item.show !== false)
+                      .map((item) => (
+                        // Only `variants`/`transition` — the items inherit their
+                        // hidden→visible→exit state from the panel, so its
+                        // `staggerChildren` / `delayChildren` actually cascade.
+                        <motion.li
+                          key={item.label}
+                          variants={itemMotion.variants}
+                          transition={itemMotion.transition}
+                        >
+                          <button
+                            type="button"
+                            className={styles.item}
+                            onClick={() => select(item)}
+                          >
+                            {item.label}
+                          </button>
+                        </motion.li>
+                      ))}
+                  </motion.ul>
+                )}
+              </AnimatePresence>
+            </div>
+          ))}
       </div>
 
       <Modal

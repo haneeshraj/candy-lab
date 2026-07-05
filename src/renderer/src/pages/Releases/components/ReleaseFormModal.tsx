@@ -280,7 +280,7 @@ function ReleaseForm({
           accept="image/*"
           fileName={coverFile?.name ?? (coverUrl ? 'Current cover' : null)}
           previewUrl={coverPreview}
-          hint="3000×3000 — stored as 500×500 WebP"
+          hint="Square 500×500 to 3000×3000 — stored as 500×500 WebP"
           onSelect={(file) => void pickCover(file)}
         />
         <FileField

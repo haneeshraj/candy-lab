@@ -4,8 +4,8 @@
 // is validated to 1080×1920 and re-encoded to a 480p WebM (best-effort — if the
 // browser can't re-encode, the original is uploaded unchanged).
 
-const COVER_INPUT = 3000
-const COVER_OUTPUT = 500
+const COVER_MAX = 3000
+const COVER_SIZE = 500 // target output size; also the minimum accepted
 const COVER_QUALITY = 0.9
 
 const CANVAS_INPUT_W = 1080
@@ -26,23 +26,34 @@ function loadImage(url: string): Promise<HTMLImageElement> {
   })
 }
 
-/** Validate a 3000×3000 cover and return a 500×500 WebP. */
+/**
+ * Validate a square cover between 500×500 and 3000×3000 and return a 500×500
+ * WebP. If it's already 500×500, it's uploaded as-is (no re-compression).
+ */
 export async function prepareCoverArt(file: File): Promise<PrepareResult> {
   const url = URL.createObjectURL(file)
   try {
     const img = await loadImage(url)
-    if (img.naturalWidth !== COVER_INPUT || img.naturalHeight !== COVER_INPUT) {
+    const { naturalWidth: width, naturalHeight: height } = img
+
+    if (width !== height) {
+      return { error: `Cover art must be square (got ${width}×${height}).` }
+    }
+    if (width < COVER_SIZE || width > COVER_MAX) {
       return {
-        error: `Cover art must be exactly ${COVER_INPUT}×${COVER_INPUT}px (got ${img.naturalWidth}×${img.naturalHeight}).`
+        error: `Cover art must be square, ${COVER_SIZE}×${COVER_SIZE} to ${COVER_MAX}×${COVER_MAX} (got ${width}×${height}).`
       }
     }
 
+    // Already at the target size — no resize/compression needed.
+    if (width === COVER_SIZE) return { file }
+
     const canvas = document.createElement('canvas')
-    canvas.width = COVER_OUTPUT
-    canvas.height = COVER_OUTPUT
+    canvas.width = COVER_SIZE
+    canvas.height = COVER_SIZE
     const ctx = canvas.getContext('2d')
     if (!ctx) return { error: 'Image processing is unavailable.' }
-    ctx.drawImage(img, 0, 0, COVER_OUTPUT, COVER_OUTPUT)
+    ctx.drawImage(img, 0, 0, COVER_SIZE, COVER_SIZE)
 
     const blob = await new Promise<Blob | null>((resolve) =>
       canvas.toBlob(resolve, 'image/webp', COVER_QUALITY)

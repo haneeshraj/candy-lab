@@ -55,15 +55,14 @@ interface GithubReleaseResponse {
 
 /**
  * Fetch the latest published release from GitHub for the "Release Notes" dialog.
- * Uses the baked-in read-only token to reach the private repo. Returns `null` if
- * the request fails (offline, no token in dev, no releases yet).
+ * Public repositories do not need an auth token. Returns `null` if the request
+ * fails (offline, no releases yet, or GitHub returns a non-OK status).
  */
 export async function getLatestRelease(): Promise<ReleaseInfo | null> {
   const headers: Record<string, string> = {
     Accept: 'application/vnd.github+json',
     'User-Agent': 'candy-lab'
   }
-  if (__UPDATE_TOKEN__) headers.Authorization = `token ${__UPDATE_TOKEN__}`
 
   try {
     const res = await fetch(
@@ -97,14 +96,6 @@ export function initUpdater(): void {
   autoUpdater.autoDownload = true
   autoUpdater.autoInstallOnAppQuit = true
   autoUpdater.logger = logger
-
-  // Private repo: electron-updater only selects its authenticated provider (which
-  // pulls latest.yml + the installer from the GitHub *API* asset URLs) when a
-  // token is exposed via GH_TOKEN/GITHUB_TOKEN — `requestHeaders` is NOT enough.
-  // Hand it the baked read-only token so update checks authenticate.
-  if (__UPDATE_TOKEN__) {
-    process.env.GH_TOKEN = __UPDATE_TOKEN__
-  }
 
   autoUpdater.on('checking-for-update', () => broadcast({ status: 'checking' }))
   autoUpdater.on('update-available', (info) =>

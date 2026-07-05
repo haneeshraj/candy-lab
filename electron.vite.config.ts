@@ -1,7 +1,7 @@
 import { resolve } from 'path'
 import { execSync } from 'child_process'
 import { readFileSync } from 'fs'
-import { defineConfig, loadEnv } from 'electron-vite'
+import { defineConfig } from 'electron-vite'
 import react from '@vitejs/plugin-react'
 
 // App metadata baked in at build/dev time and exposed to the main process as the
@@ -29,16 +29,9 @@ const appInfo = {
   buildDate: new Date().toISOString()
 }
 
-// Read-only GitHub token for downloading updates from the private repo. Pulled
-// from `.env` (or the shell) at build time and baked into the main bundle —
-// NEVER committed. Empty in dev / when unset (updater just won't authenticate).
-// `''` prefix loads all keys, not just `VITE_`-prefixed ones.
-const env = loadEnv(process.env.NODE_ENV ?? 'production', process.cwd(), '')
-const updateToken = process.env.CANDY_LAB_UPDATE_TOKEN ?? env.CANDY_LAB_UPDATE_TOKEN ?? ''
-
 const define = {
   __APP_INFO__: JSON.stringify(appInfo),
-  __UPDATE_TOKEN__: JSON.stringify(updateToken)
+  __UPDATE_TOKEN__: JSON.stringify('')
 }
 
 export default defineConfig({

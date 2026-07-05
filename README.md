@@ -84,6 +84,12 @@ Config lives at the root: `electron.vite.config.ts`, `vitest.config.ts`,
 | `npm run lint:fix`     | Auto-fix ESLint + Stylelint issues                                    |
 | `npm run format`       | Prettier write across the repo                                        |
 
+### Release workflow
+
+Use the `release:*` scripts only after you have created and pushed a version tag like `v1.0.2`. They publish with `electron-builder --publish onTag`, so they will not create a new GitHub release for a non-tagged commit.
+
+You still need `GH_TOKEN` or `GITHUB_TOKEN` available when publishing so GitHub accepts the upload.
+
 ---
 
 ## Code quality & enforcement

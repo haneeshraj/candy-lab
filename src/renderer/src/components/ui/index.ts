@@ -3,6 +3,7 @@
 
 export { Button } from './Button/Button'
 export { TextField } from './TextField/TextField'
+export { TextArea } from './TextArea/TextArea'
 export { Select } from './Select/Select'
 export type { SelectOption } from './Select/Select'
 export { Checkbox } from './Checkbox/Checkbox'

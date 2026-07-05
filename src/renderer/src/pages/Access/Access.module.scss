@@ -1,0 +1,180 @@
+@use 'abstracts' as *;
+
+.access {
+  display: flex;
+  flex-direction: column;
+  gap: space(5);
+  padding: space(6);
+}
+
+.header {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+}
+
+.title {
+  font-size: $font-size-2xl;
+  font-weight: $font-weight-semibold;
+  color: $text-primary;
+}
+
+.subtitle {
+  margin: space(1) 0 0;
+  font-size: $font-size-sm;
+  color: $text-secondary;
+}
+
+.section {
+  display: flex;
+  flex-direction: column;
+  gap: space(3);
+}
+
+.sectionTitle {
+  display: flex;
+  gap: space(2);
+  align-items: center;
+  font-size: $font-size-sm;
+  font-weight: $font-weight-semibold;
+  color: $text-secondary;
+  text-transform: uppercase;
+  letter-spacing: $letter-spacing-wide;
+}
+
+.count {
+  @include flex-center;
+
+  min-width: rem(20px);
+  height: rem(20px);
+  padding: 0 space(2);
+  font-size: $font-size-xs;
+  color: $text-secondary;
+  background-color: $surface-light;
+  border-radius: $radius-pill;
+}
+
+.list {
+  display: flex;
+  flex-direction: column;
+  gap: space(2);
+  padding: 0;
+  margin: 0;
+  list-style: none;
+}
+
+.row {
+  display: flex;
+  gap: space(4);
+  align-items: center;
+  justify-content: space-between;
+  padding: space(3) space(4);
+  background-color: $background;
+  border: $border-width solid $border;
+  border-radius: $radius-lg;
+}
+
+.info {
+  display: flex;
+  flex-direction: column;
+  gap: space(1);
+  min-width: 0;
+}
+
+.nameRow {
+  display: flex;
+  gap: space(2);
+  align-items: center;
+}
+
+.name {
+  @include truncate;
+
+  font-size: $font-size-md;
+  font-weight: $font-weight-medium;
+  color: $text-primary;
+}
+
+.admin,
+.you {
+  padding: rem(1px) space(2);
+  font-size: $font-size-xs;
+  border-radius: $radius-pill;
+}
+
+.admin {
+  color: $primary;
+  background-color: with-alpha($primary, 0.14);
+}
+
+.you {
+  color: $text-secondary;
+  background-color: $surface-light;
+}
+
+.email {
+  @include truncate;
+
+  font-size: $font-size-sm;
+  color: $text-secondary;
+}
+
+.notes {
+  @include line-clamp(2);
+
+  font-size: $font-size-xs;
+  color: $text-secondary;
+}
+
+.actions {
+  display: flex;
+  flex-shrink: 0;
+  gap: space(2);
+}
+
+.action {
+  @include flex-center;
+  @include size(rem(34px));
+
+  color: $text-secondary;
+  cursor: pointer;
+  background-color: $surface;
+  border: $border-width solid $border;
+  border-radius: $radius-md;
+  transition: $transition-colors;
+
+  @include hover {
+    color: $text-primary;
+    border-color: $primary;
+  }
+}
+
+.approve {
+  @include hover {
+    color: $success;
+    border-color: $success;
+  }
+}
+
+.ban {
+  @include hover {
+    color: $error;
+    border-color: $error;
+  }
+}
+
+.state {
+  padding: space(16) space(6);
+  font-size: $font-size-sm;
+  color: $text-secondary;
+  text-align: center;
+}
+
+.error {
+  padding: space(3);
+  margin: 0;
+  font-size: $font-size-sm;
+  color: $error;
+  background-color: with-alpha($error, 0.12);
+  border-radius: $radius-md;
+}

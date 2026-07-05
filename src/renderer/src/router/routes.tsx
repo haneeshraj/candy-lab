@@ -21,6 +21,7 @@ export interface AppRoute {
 }
 
 const Releases = lazy(() => import('@renderer/pages/Releases/Releases'))
+const Access = lazy(() => import('@renderer/pages/Access/Access'))
 
 /** The application's route table. */
 export const routes: AppRoute[] = [
@@ -31,5 +32,9 @@ export const routes: AppRoute[] = [
   {
     path: ROUTE_PATHS.RELEASES,
     element: <Releases />
+  },
+  {
+    path: ROUTE_PATHS.ACCESS,
+    element: <Access />
   }
 ]

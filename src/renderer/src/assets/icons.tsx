@@ -84,3 +84,34 @@ export function IconTrash(props: React.SVGProps<SVGSVGElement>): React.JSX.Eleme
     </Icon>
   )
 }
+
+/** People — the Access (user management) route. */
+export function IconUsers(props: React.SVGProps<SVGSVGElement>): React.JSX.Element {
+  return (
+    <Icon {...props}>
+      <path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2" />
+      <circle cx="9" cy="7" r="4" />
+      <path d="M22 21v-2a4 4 0 0 0-3-3.87" />
+      <path d="M16 3.13a4 4 0 0 1 0 7.75" />
+    </Icon>
+  )
+}
+
+/** Check — approve / grant access. */
+export function IconCheck(props: React.SVGProps<SVGSVGElement>): React.JSX.Element {
+  return (
+    <Icon {...props}>
+      <path d="M20 6 9 17l-5-5" />
+    </Icon>
+  )
+}
+
+/** Ban — decline / revoke access. */
+export function IconBan(props: React.SVGProps<SVGSVGElement>): React.JSX.Element {
+  return (
+    <Icon {...props}>
+      <circle cx="12" cy="12" r="10" />
+      <line x1="4.9" y1="4.9" x2="19.1" y2="19.1" />
+    </Icon>
+  )
+}

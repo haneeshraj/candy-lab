@@ -2,9 +2,11 @@ import { HashRouter } from 'react-router-dom'
 import { AppRouter } from '@renderer/router'
 import { TitleBar } from '../components/TitleBar'
 import { Sidebar } from '../components/Sidebar'
+import { AuthGate } from '../components/AuthGate'
 import { useAppBootstrap } from './useAppBootstrap'
 import { useThemeSync } from './useThemeSync'
 import { useUpdaterSync } from './useUpdaterSync'
+import { useAuthSync } from './useAuthSync'
 
 /**
  * Top-level composition. Runs app-wide setup (bootstrap + theme sync) once, and
@@ -16,17 +18,20 @@ export function AppRoot(): React.JSX.Element {
   useAppBootstrap()
   useThemeSync()
   useUpdaterSync()
+  useAuthSync()
 
   return (
     <HashRouter>
       <div className="app-shell">
         <TitleBar />
-        <div className="app-main">
-          <Sidebar />
-          <div className="app-body">
-            <AppRouter />
+        <AuthGate>
+          <div className="app-main">
+            <Sidebar />
+            <div className="app-body">
+              <AppRouter />
+            </div>
           </div>
-        </div>
+        </AuthGate>
       </div>
     </HashRouter>
   )

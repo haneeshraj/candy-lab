@@ -3,7 +3,8 @@
 
 export const ROUTE_PATHS = {
   ROOT: '/',
-  RELEASES: '/releases'
+  RELEASES: '/releases',
+  ACCESS: '/access'
 } as const
 
 /** Union of all valid route paths. */
@@ -15,5 +16,6 @@ export type RoutePath = (typeof ROUTE_PATHS)[keyof typeof ROUTE_PATHS]
  */
 export const ROUTE_TITLES: Record<RoutePath, string> = {
   [ROUTE_PATHS.ROOT]: 'Home',
-  [ROUTE_PATHS.RELEASES]: 'Releases'
+  [ROUTE_PATHS.RELEASES]: 'Releases',
+  [ROUTE_PATHS.ACCESS]: 'Access'
 }

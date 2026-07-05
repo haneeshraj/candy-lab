@@ -1,0 +1,23 @@
+@use 'abstracts' as *;
+
+.form {
+  display: flex;
+  flex-direction: column;
+  gap: space(4);
+}
+
+.error {
+  padding: space(3);
+  margin: 0;
+  font-size: $font-size-sm;
+  color: $error;
+  background-color: with-alpha($error, 0.12);
+  border-radius: $radius-md;
+}
+
+.actions {
+  display: flex;
+  justify-content: flex-end;
+  gap: space(3);
+  padding-top: space(2);
+}

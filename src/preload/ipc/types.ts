@@ -167,6 +167,63 @@ export interface ReleasesApi {
   uploadAsset: (input: UploadAssetInput) => Promise<string>
 }
 
+// ── Auth & access control ────────────────────────────────────────────────────
+
+/** Where a user sits in the approval lifecycle. */
+export type AccessStatus = 'pending' | 'approved' | 'banned'
+
+/** Whether a user can administer access. */
+export type UserRole = 'user' | 'admin'
+
+/** A user's profile / access record. */
+export interface Profile {
+  id: string
+  email: string
+  name: string | null
+  notes: string | null
+  role: UserRole
+  status: AccessStatus
+  /** ISO timestamp. */
+  createdAt: string
+}
+
+/** The signed-in identity (from Supabase Auth). */
+export interface AuthUser {
+  id: string
+  email: string | null
+}
+
+/** Snapshot of the auth/access state, pushed to the renderer on change. */
+export interface AuthState {
+  authenticated: boolean
+  user: AuthUser | null
+  /** Null until the profile row is read; carries role + approval status. */
+  profile: Profile | null
+}
+
+export interface AuthApi {
+  /** Start Google sign-in (opens the system browser); resolves to the new state. */
+  signInWithGoogle: () => Promise<AuthState>
+  /** Sign out and clear the persisted session. */
+  signOut: () => Promise<void>
+  /** Current auth/access state (restores a persisted session on first call). */
+  getState: () => Promise<AuthState>
+  /** Subscribe to auth-state changes; returns an unsubscribe function. */
+  onStateChange: (callback: (state: AuthState) => void) => () => void
+}
+
+/** Admin-only access management. All calls require an approved admin. */
+export interface AccessApi {
+  /** Everyone (pending / approved / banned), newest first. */
+  listUsers: () => Promise<Profile[]>
+  /** Approve / ban / reset a user's access. */
+  setStatus: (id: string, status: AccessStatus) => Promise<Profile>
+  /** Promote/demote a user's admin role. */
+  setRole: (id: string, role: UserRole) => Promise<Profile>
+  /** Edit a user's profile (name / notes; email is immutable). */
+  updateUser: (id: string, changes: { name?: string; notes?: string }) => Promise<Profile>
+}
+
 /** The complete API surface exposed to the renderer. */
 export interface RendererApi {
   app: AppApi
@@ -174,4 +231,6 @@ export interface RendererApi {
   system: SystemApi
   updater: UpdaterApi
   releases: ReleasesApi
+  auth: AuthApi
+  access: AccessApi
 }

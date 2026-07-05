@@ -29,6 +29,16 @@ export const IPC_CHANNELS = {
   SETTINGS_GET: 'settings:get', // invoke(key) → unknown
   SETTINGS_SET: 'settings:set', // invoke(key, value)
 
+  // Auth & access control
+  AUTH_SIGN_IN_GOOGLE: 'auth:sign-in-google', // invoke → AuthState
+  AUTH_SIGN_OUT: 'auth:sign-out', // invoke → void
+  AUTH_GET_STATE: 'auth:get-state', // invoke → AuthState
+  AUTH_STATE_CHANGED: 'auth:state-changed', // main → renderer
+  ACCESS_LIST_USERS: 'access:list-users', // invoke → Profile[]
+  ACCESS_SET_STATUS: 'access:set-status', // invoke(id, status) → Profile
+  ACCESS_SET_ROLE: 'access:set-role', // invoke(id, role) → Profile
+  ACCESS_UPDATE_USER: 'access:update-user', // invoke(id, changes) → Profile
+
   // Releases (music catalog CMS)
   RELEASES_LIST: 'releases:list', // invoke → Release[]
   RELEASES_CREATE: 'releases:create', // invoke(ReleaseInput) → Release

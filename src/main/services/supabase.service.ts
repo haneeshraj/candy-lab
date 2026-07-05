@@ -8,6 +8,8 @@ import { logger } from '../utils/logger'
 
 const SUPABASE_URL = import.meta.env.MAIN_VITE_SUPABASE_URL ?? process.env.SUPABASE_URL
 const SUPABASE_KEY = import.meta.env.MAIN_VITE_SUPABASE_KEY ?? process.env.SUPABASE_KEY
+const SUPABASE_ANON_KEY =
+  import.meta.env.MAIN_VITE_SUPABASE_ANON_KEY ?? process.env.SUPABASE_ANON_KEY
 
 /** Storage bucket for cover art + canvas videos (see `supabase/schema.sql`). */
 export const MEDIA_BUCKET = 'release-media'
@@ -25,6 +27,17 @@ let client: SupabaseClient | null = null
 /** True when both credentials are present. */
 export function isSupabaseConfigured(): boolean {
   return Boolean(SUPABASE_URL && SUPABASE_KEY)
+}
+
+/** URL + anon key for the user-facing auth client (Google sign-in). Throws a
+ * friendly error when either is missing. */
+export function getAuthCredentials(): { url: string; anonKey: string } {
+  if (!SUPABASE_URL || !SUPABASE_ANON_KEY) {
+    throw new SupabaseConfigError(
+      "Sign-in isn't configured. Add MAIN_VITE_SUPABASE_URL and MAIN_VITE_SUPABASE_ANON_KEY to your .env (see supabase/README.md), then restart the app."
+    )
+  }
+  return { url: SUPABASE_URL, anonKey: SUPABASE_ANON_KEY }
 }
 
 /**

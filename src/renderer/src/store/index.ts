@@ -26,3 +26,16 @@ export type {
   UpdateInfo,
   AppInfo
 } from './electron/types'
+
+export { useAuthStore, selectAuthPhase } from './auth/useAuthStore'
+export type {
+  AuthStore,
+  AuthState,
+  AuthStoreState,
+  AuthActions,
+  AuthPhase,
+  Profile,
+  AuthUser,
+  AccessStatus,
+  UserRole
+} from './auth/types'

@@ -43,5 +43,4 @@ publish:
   owner: haneeshraj
   repo: candy-lab
   private: false
-  releaseType: draft # upload to a draft; you publish it yourself in the GitHub UI
-
+  releaseType: draft

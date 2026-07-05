@@ -51,3 +51,45 @@ bundle only. Restart `npm run dev` after editing `.env`.
 Run the app (`npm run dev`), open **Releases**, and click **Add Release**. If the
 credentials are missing or wrong, the UI shows a clear "Supabase isn't
 configured" error instead of crashing.
+
+---
+
+## 6. Auth — Google sign-in & access control
+
+The app is gated: people sign in with Google, land as **pending**, and an
+**admin** approves or bans them. Identity uses Supabase Auth; the desktop app
+drives Google OAuth from its **main process** via a loopback redirect (the
+renderer never handles tokens).
+
+### a. Run the auth schema
+
+Run [`migrations/002_auth_profiles.sql`](./migrations/002_auth_profiles.sql) (or
+the auth section of `schema.sql`). It creates the `profiles` table + the trigger
+that auto-creates a `pending` profile on first sign-in.
+
+### b. Create a Google OAuth client
+
+1. In **Google Cloud Console → APIs & Services → Credentials**, configure the
+   OAuth consent screen, then create an **OAuth client ID** of type
+   **Web application**.
+2. Add this **Authorized redirect URI** (Supabase's callback):
+   `https://<your-project-ref>.supabase.co/auth/v1/callback`
+3. Copy the **Client ID** and **Client secret**.
+
+### c. Enable Google in Supabase
+
+- **Auth → Providers → Google** → enable, paste the Client ID + secret.
+- **Auth → URL Configuration → Redirect URLs** → add the app's loopback URL:
+  `http://localhost:51789/callback`
+
+### d. Bootstrap yourself as admin (one-time)
+
+Sign in through the app once (this creates your `pending` profile), then run:
+
+```sql
+update public.profiles set role = 'admin', status = 'approved'
+where email = 'banisetti.h@northeastern.edu';
+```
+
+Restart the app — you now have full access and the **Access** admin panel, where
+you approve/ban everyone else.

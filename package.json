@@ -52,6 +52,7 @@
     "@electron-toolkit/preload": "^3.0.2",
     "@electron-toolkit/utils": "^4.0.0",
     "@fontsource/montserrat": "^5.2.8",
+    "@supabase/supabase-js": "^2.110.0",
     "electron-updater": "^6.3.9",
     "motion": "^12.42.2",
     "react-markdown": "^10.1.0",

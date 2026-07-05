@@ -2,7 +2,8 @@ import {
   registerAppHandlers,
   registerWindowHandlers,
   registerSystemHandlers,
-  registerUpdaterHandlers
+  registerUpdaterHandlers,
+  registerReleaseHandlers
 } from './handlers'
 import { logger } from '../utils/logger'
 
@@ -15,5 +16,6 @@ export function registerIpc(): void {
   registerWindowHandlers()
   registerSystemHandlers()
   registerUpdaterHandlers()
+  registerReleaseHandlers()
   logger.info('IPC handlers registered')
 }

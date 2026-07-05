@@ -1,0 +1,48 @@
+@use 'abstracts' as *;
+
+.field {
+  display: flex;
+  flex-direction: column;
+  gap: space(2);
+}
+
+.label {
+  font-size: $font-size-sm;
+  font-weight: $font-weight-medium;
+  color: $text-secondary;
+}
+
+.chips {
+  display: flex;
+  flex-wrap: wrap;
+  gap: space(2);
+}
+
+.chip {
+  padding: space(2) space(3);
+  font-size: $font-size-xs;
+  font-weight: $font-weight-medium;
+  color: $text-secondary;
+  cursor: pointer;
+  background-color: $background;
+  border: $border-width solid $border;
+  border-radius: $radius-pill;
+  transition: $transition-colors;
+
+  @include hover {
+    color: $text-primary;
+    border-color: $primary;
+  }
+}
+
+.selected {
+  color: $background;
+  background-color: $primary;
+  border-color: $primary;
+
+  @include hover {
+    color: $background;
+    background-color: $primary-dark;
+    border-color: $primary-dark;
+  }
+}

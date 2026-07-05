@@ -4,6 +4,7 @@ import { appBridge } from './bridge/app.bridge'
 import { windowBridge } from './bridge/window.bridge'
 import { systemBridge } from './bridge/system.bridge'
 import { updaterBridge } from './bridge/updater.bridge'
+import { releasesBridge } from './bridge/releases.bridge'
 import type { RendererApi } from './ipc/types'
 
 // The single, curated API surface exposed to the renderer. Domain-grouped and
@@ -12,7 +13,8 @@ const api: RendererApi = {
   app: appBridge,
   window: windowBridge,
   system: systemBridge,
-  updater: updaterBridge
+  updater: updaterBridge,
+  releases: releasesBridge
 }
 
 // Only expose via contextBridge when context isolation is on (it always is in

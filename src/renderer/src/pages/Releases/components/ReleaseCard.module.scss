@@ -1,0 +1,111 @@
+@use 'abstracts' as *;
+
+.card {
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+  cursor: pointer;
+  background-color: $background;
+  border: $border-width solid $border;
+  border-radius: $radius-lg;
+  transition: $transition-base;
+
+  @include hover {
+    border-color: $primary;
+    box-shadow: $shadow-md;
+  }
+
+  &:focus-visible {
+    border-color: $primary;
+    outline: none;
+    box-shadow: 0 0 0 $border-width-thick $focus-ring;
+  }
+}
+
+.cover {
+  @include flex-center;
+
+  aspect-ratio: 1 / 1;
+  overflow: hidden;
+  background-color: $surface-light;
+}
+
+.art {
+  @include size(100%);
+
+  object-fit: cover;
+}
+
+.placeholder {
+  font-size: $font-size-4xl;
+  color: $text-secondary;
+  opacity: $opacity-muted;
+}
+
+.body {
+  display: flex;
+  flex-direction: column;
+  gap: space(2);
+  padding: space(4);
+}
+
+.head {
+  display: flex;
+  gap: space(2);
+  align-items: flex-start;
+  justify-content: space-between;
+}
+
+.name {
+  @include line-clamp(2);
+
+  font-size: $font-size-md;
+  font-weight: $font-weight-semibold;
+  color: $text-primary;
+}
+
+.type {
+  flex-shrink: 0;
+  padding: space(1) space(2);
+  font-size: $font-size-xs;
+  color: $primary;
+  background-color: with-alpha($primary, 0.14);
+  border-radius: $radius-pill;
+}
+
+.artists {
+  @include truncate;
+
+  margin: 0;
+  font-size: $font-size-sm;
+  color: $text-secondary;
+}
+
+.meta {
+  display: flex;
+  gap: space(3);
+  align-items: center;
+  font-size: $font-size-xs;
+  color: $text-secondary;
+}
+
+.live {
+  color: $success;
+}
+
+.platforms {
+  display: flex;
+  flex-wrap: wrap;
+  gap: space(1);
+  padding: 0;
+  margin: space(1) 0 0;
+  list-style: none;
+}
+
+.platform {
+  padding: space(1) space(2);
+  font-size: $font-size-xs;
+  color: $text-secondary;
+  border: $border-width solid $divider;
+  border-radius: $radius-sm;
+}

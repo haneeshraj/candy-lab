@@ -1,0 +1,23 @@
+@use 'abstracts' as *;
+
+.field {
+  display: flex;
+  flex-direction: column;
+  gap: space(3);
+}
+
+.label {
+  font-size: $font-size-sm;
+  font-weight: $font-weight-medium;
+  color: $text-secondary;
+}
+
+.rows {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: space(3);
+
+  @include media(sm) {
+    grid-template-columns: 1fr 1fr;
+  }
+}

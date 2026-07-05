@@ -1,0 +1,200 @@
+@use 'abstracts' as *;
+
+// This modal's content always sits over a forced-dark video/overlay, so text and
+// controls use fixed light-on-dark values (not the themed tokens, which would
+// invert in light mode and become unreadable on the media). This is the
+// sanctioned "kept local with a comment" exception from the styling guide.
+
+.backdrop {
+  @include flex-center;
+
+  position: fixed;
+  inset: 0;
+  z-index: z(modal);
+  padding: space(6);
+  background-color: $overlay;
+}
+
+.dialog {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  justify-content: flex-end;
+  width: 100%;
+  max-width: rem(420px);
+  aspect-ratio: 9 / 16;
+  max-height: calc(100vh - #{space(12)});
+  overflow: hidden;
+  background-color: $surface;
+  border-radius: $radius-lg;
+  box-shadow: $shadow-xl;
+}
+
+.media {
+  position: absolute;
+  inset: 0;
+  z-index: 0;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.blur {
+  transform: scale(1.1);
+  filter: blur(20px);
+}
+
+.overlay {
+  position: absolute;
+  inset: 0;
+  z-index: 1;
+  background-color: rgb(0 0 0 / 50%);
+}
+
+.topbar {
+  position: absolute;
+  top: space(3);
+  right: space(3);
+  z-index: 3;
+  display: flex;
+  gap: space(2);
+}
+
+.iconButton {
+  @include flex-center;
+  @include size(rem(34px));
+
+  color: rgb(255 255 255);
+  cursor: pointer;
+  background-color: rgb(0 0 0 / 40%);
+  border: $border-width solid rgb(255 255 255 / 20%);
+  border-radius: $radius-md;
+  backdrop-filter: blur(6px);
+  transition: $transition-colors;
+
+  @include hover {
+    border-color: rgb(255 255 255 / 60%);
+  }
+}
+
+.danger {
+  @include hover {
+    color: tint($error, 0.35);
+    border-color: tint($error, 0.35);
+  }
+}
+
+.bottom {
+  position: relative;
+  z-index: 2;
+  display: flex;
+  gap: space(4);
+  align-items: flex-end;
+  padding: space(5);
+  background: linear-gradient(to top, rgb(0 0 0 / 65%), transparent);
+}
+
+.cover {
+  @include flex-center;
+  @include size(rem(96px));
+
+  flex-shrink: 0;
+  overflow: hidden;
+  background-color: rgb(255 255 255 / 10%);
+  border: $border-width solid rgb(255 255 255 / 20%);
+  border-radius: $radius-md;
+}
+
+.coverArt {
+  @include size(100%);
+
+  object-fit: cover;
+}
+
+.coverPlaceholder {
+  font-size: $font-size-3xl;
+  color: rgb(255 255 255 / 60%);
+}
+
+.info {
+  display: flex;
+  flex-direction: column;
+  gap: space(2);
+  min-width: 0;
+}
+
+.titleRow {
+  display: flex;
+  flex-wrap: wrap;
+  gap: space(2);
+  align-items: center;
+}
+
+.name {
+  font-size: $font-size-2xl;
+  font-weight: $font-weight-semibold;
+  line-height: $line-height-tight;
+  color: rgb(255 255 255);
+}
+
+.type {
+  padding: space(1) space(2);
+  font-size: $font-size-xs;
+  color: rgb(255 255 255);
+  background-color: rgb(255 255 255 / 16%);
+  border-radius: $radius-pill;
+}
+
+.live {
+  font-size: $font-size-xs;
+  color: $success;
+}
+
+.artists {
+  margin: 0;
+  font-size: $font-size-sm;
+  color: rgb(255 255 255 / 85%);
+}
+
+.date {
+  margin: 0;
+  font-size: $font-size-xs;
+  color: rgb(255 255 255 / 60%);
+}
+
+.tags {
+  display: flex;
+  flex-wrap: wrap;
+  gap: space(1);
+}
+
+.tag {
+  padding: space(1) space(2);
+  font-size: $font-size-xs;
+  color: rgb(255 255 255 / 85%);
+  background-color: rgb(255 255 255 / 12%);
+  border-radius: $radius-pill;
+}
+
+.links {
+  display: flex;
+  flex-wrap: wrap;
+  gap: space(2);
+  margin-top: space(1);
+}
+
+.link {
+  padding: space(1) space(3);
+  font-size: $font-size-xs;
+  font-weight: $font-weight-medium;
+  color: rgb(255 255 255);
+  cursor: pointer;
+  background-color: rgb(255 255 255 / 14%);
+  border: $border-width solid rgb(255 255 255 / 20%);
+  border-radius: $radius-pill;
+  transition: $transition-colors;
+
+  @include hover {
+    background-color: rgb(255 255 255 / 24%);
+  }
+}

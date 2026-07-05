@@ -1,0 +1,116 @@
+@use 'abstracts' as *;
+
+.field {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  gap: space(2);
+}
+
+.label {
+  font-size: $font-size-sm;
+  font-weight: $font-weight-medium;
+  color: $text-secondary;
+}
+
+.box {
+  display: flex;
+  flex-wrap: wrap;
+  gap: space(2);
+  align-items: center;
+  min-height: $control-height;
+  padding: space(2) space(3);
+  background-color: $background;
+  border: $border-width solid $border;
+  border-radius: $radius-md;
+  transition: $transition-colors;
+
+  &:focus-within {
+    border-color: $primary;
+    box-shadow: 0 0 0 $border-width-thick $focus-ring;
+  }
+}
+
+.chip {
+  display: inline-flex;
+  gap: space(1);
+  align-items: center;
+  padding: space(1) space(2);
+  font-size: $font-size-xs;
+  color: $text-primary;
+  background-color: with-alpha($primary, 0.14);
+  border-radius: $radius-pill;
+}
+
+.remove {
+  display: inline-flex;
+  padding: 0;
+  font-size: $font-size-md;
+  line-height: 1;
+  color: $text-secondary;
+  cursor: pointer;
+  background: none;
+  border: none;
+
+  @include hover {
+    color: $text-primary;
+  }
+}
+
+.input {
+  flex: 1;
+  min-width: rem(120px);
+  height: rem(24px);
+  font-size: $font-size-sm;
+  color: $text-primary;
+  background: none;
+  border: none;
+
+  &:focus-visible {
+    outline: none;
+  }
+
+  &::placeholder {
+    color: $text-secondary;
+    opacity: $opacity-muted;
+  }
+}
+
+.dropdown {
+  position: absolute;
+  inset-inline: 0;
+  top: calc(100% + #{space(1)});
+  z-index: z(dropdown);
+  max-height: rem(200px);
+  padding: space(1);
+  margin: 0;
+  overflow-y: auto;
+  list-style: none;
+  background-color: $surface-light;
+  border: $border-width solid $border;
+  border-radius: $radius-md;
+  box-shadow: $shadow-lg;
+
+  @include scrollbar;
+}
+
+.option {
+  width: 100%;
+  padding: space(2) space(3);
+  font-size: $font-size-sm;
+  color: $text-primary;
+  text-align: left;
+  cursor: pointer;
+  background: none;
+  border: none;
+  border-radius: $radius-sm;
+
+  @include hover {
+    background-color: with-alpha($primary, 0.14);
+  }
+}
+
+.create {
+  color: $primary;
+  font-weight: $font-weight-medium;
+}

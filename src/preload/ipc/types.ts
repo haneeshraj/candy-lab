@@ -92,10 +92,86 @@ export interface UpdaterApi {
   getLatestRelease: () => Promise<ReleaseInfo | null>
 }
 
+// ── Releases (music catalog CMS) ─────────────────────────────────────────────
+
+/** The kind of release. Mirrors the DB `check` constraint. */
+export type ProjectType = 'single' | 'ep' | 'album' | 'remix' | 'bootleg' | 'compilation'
+
+/** A distributor / streaming platform a release is available on. */
+export type ReleasePlatform = 'Spotify' | 'Apple Music' | 'YouTube' | 'SoundCloud' | 'Amazon Music'
+
+/** An artist credited on releases. */
+export interface Artist {
+  id: string
+  name: string
+}
+
+/** A release with its resolved artist credits. */
+export interface Release {
+  id: string
+  projectName: string
+  projectType: ProjectType
+  /** ISO date (`YYYY-MM-DD`) or `null`. */
+  releaseDate: string | null
+  genres: string[]
+  /** Map of platform name → track URL. Keys are the platforms it's released on. */
+  platformLinks: Record<string, string>
+  visualLink: string | null
+  masterLink: string | null
+  coverArtUrl: string | null
+  canvasUrl: string | null
+  previewEnabled: boolean
+  /** ISO timestamp. */
+  createdAt: string
+  artists: Artist[]
+}
+
+/** Payload for creating a release. Artists are referenced by id (create them
+ * first via `createArtist` so inline-added names get an id). */
+export interface ReleaseInput {
+  projectName: string
+  projectType: ProjectType
+  releaseDate: string | null
+  genres: string[]
+  platformLinks: Record<string, string>
+  visualLink: string | null
+  masterLink: string | null
+  coverArtUrl: string | null
+  canvasUrl: string | null
+  previewEnabled: boolean
+  artistIds: string[]
+}
+
+/** A media file to upload to Supabase Storage. */
+export interface UploadAssetInput {
+  fileName: string
+  contentType: string
+  /** Raw file bytes (transferred over IPC via structured clone). */
+  data: Uint8Array
+}
+
+export interface ReleasesApi {
+  /** All releases, newest first, with their artist credits. */
+  list: () => Promise<Release[]>
+  /** Create a release (and its artist relations). Returns the created row. */
+  create: (input: ReleaseInput) => Promise<Release>
+  /** Update a release (and its artist relations). Returns the updated row. */
+  update: (id: string, input: ReleaseInput) => Promise<Release>
+  /** Delete a release, its relations, and its media. */
+  remove: (id: string) => Promise<void>
+  /** All artists, alphabetical — cache for the multi-select dropdown. */
+  listArtists: () => Promise<Artist[]>
+  /** Get-or-create an artist by name (case-insensitive, no duplicates). */
+  createArtist: (name: string) => Promise<Artist>
+  /** Upload a media file to storage; resolves to its public URL. */
+  uploadAsset: (input: UploadAssetInput) => Promise<string>
+}
+
 /** The complete API surface exposed to the renderer. */
 export interface RendererApi {
   app: AppApi
   window: WindowApi
   system: SystemApi
   updater: UpdaterApi
+  releases: ReleasesApi
 }

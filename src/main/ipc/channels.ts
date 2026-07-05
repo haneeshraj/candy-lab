@@ -27,7 +27,16 @@ export const IPC_CHANNELS = {
 
   // Settings
   SETTINGS_GET: 'settings:get', // invoke(key) → unknown
-  SETTINGS_SET: 'settings:set' // invoke(key, value)
+  SETTINGS_SET: 'settings:set', // invoke(key, value)
+
+  // Releases (music catalog CMS)
+  RELEASES_LIST: 'releases:list', // invoke → Release[]
+  RELEASES_CREATE: 'releases:create', // invoke(ReleaseInput) → Release
+  RELEASES_UPDATE: 'releases:update', // invoke(id, ReleaseInput) → Release
+  RELEASES_DELETE: 'releases:delete', // invoke(id) → void
+  RELEASES_LIST_ARTISTS: 'releases:list-artists', // invoke → Artist[]
+  RELEASES_CREATE_ARTIST: 'releases:create-artist', // invoke(name) → Artist
+  RELEASES_UPLOAD_ASSET: 'releases:upload-asset' // invoke(UploadAssetInput) → string (URL)
 } as const
 
 export type IpcChannel = (typeof IPC_CHANNELS)[keyof typeof IPC_CHANNELS]

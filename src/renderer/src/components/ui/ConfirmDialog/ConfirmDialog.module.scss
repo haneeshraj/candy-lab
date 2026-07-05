@@ -1,0 +1,20 @@
+@use 'abstracts' as *;
+
+.root {
+  display: flex;
+  flex-direction: column;
+  gap: space(5);
+}
+
+.message {
+  margin: 0;
+  font-size: $font-size-sm;
+  line-height: $line-height-normal;
+  color: $text-secondary;
+}
+
+.actions {
+  display: flex;
+  justify-content: flex-end;
+  gap: space(3);
+}

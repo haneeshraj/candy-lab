@@ -1,0 +1,76 @@
+@use 'abstracts' as *;
+
+.field {
+  display: flex;
+  flex-direction: column;
+  gap: space(2);
+}
+
+.label {
+  font-size: $font-size-sm;
+  font-weight: $font-weight-medium;
+  color: $text-secondary;
+}
+
+.control {
+  display: flex;
+  gap: space(3);
+  align-items: center;
+}
+
+.preview {
+  @include size(rem(40px));
+
+  object-fit: cover;
+  border: $border-width solid $border;
+  border-radius: $radius-sm;
+}
+
+.pick {
+  @include button-base;
+
+  height: $control-height-sm;
+  padding: 0 space(3);
+  font-size: $font-size-xs;
+  color: $text-primary;
+  background-color: $surface;
+  border-color: $border;
+  border-radius: $radius-md;
+
+  @include hover {
+    background-color: $surface-light;
+    border-color: $primary;
+  }
+}
+
+.name {
+  @include truncate;
+
+  flex: 1;
+  font-size: $font-size-xs;
+  color: $text-secondary;
+}
+
+.clear {
+  display: inline-flex;
+  padding: 0 space(1);
+  font-size: $font-size-md;
+  line-height: 1;
+  color: $text-secondary;
+  cursor: pointer;
+  background: none;
+  border: none;
+
+  @include hover {
+    color: $error;
+  }
+}
+
+.hidden {
+  display: none;
+}
+
+.hint {
+  font-size: $font-size-xs;
+  color: $text-secondary;
+}

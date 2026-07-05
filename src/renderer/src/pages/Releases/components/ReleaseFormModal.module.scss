@@ -1,0 +1,45 @@
+@use 'abstracts' as *;
+
+.form {
+  display: flex;
+  flex-direction: column;
+  gap: space(5);
+}
+
+.grid {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: space(4);
+
+  @include media(sm) {
+    grid-template-columns: 1fr 1fr;
+  }
+}
+
+.error {
+  padding: space(3);
+  margin: 0;
+  font-size: $font-size-sm;
+  color: $error;
+  background-color: with-alpha($error, 0.12);
+  border-radius: $radius-md;
+}
+
+.mediaError {
+  margin: 0;
+  font-size: $font-size-xs;
+  color: $error;
+}
+
+.mediaNote {
+  margin: 0;
+  font-size: $font-size-xs;
+  color: $text-secondary;
+}
+
+.actions {
+  display: flex;
+  justify-content: flex-end;
+  gap: space(3);
+  padding-top: space(2);
+}

@@ -51,6 +51,16 @@
   text-align: center;
 }
 
+// Infinite-scroll trigger: a short strip below the grid the observer watches.
+.sentinel {
+  @include flex(row, center, center);
+
+  min-height: rem(48px);
+  padding: space(4) 0;
+  font-size: $font-size-sm;
+  color: $text-secondary;
+}
+
 .error {
   color: $error;
 }

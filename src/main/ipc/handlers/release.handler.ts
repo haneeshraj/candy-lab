@@ -6,6 +6,7 @@ import {
   deleteRelease,
   listArtists,
   listReleases,
+  listReleaseTracks,
   updateRelease,
   uploadAsset
 } from '../../services/release.service'
@@ -15,7 +16,9 @@ import type { ReleaseInput, UploadAssetInput } from '../../../preload/ipc/types'
 // access, mapping, validation) lives in `release.service`.
 
 export function registerReleaseHandlers(): void {
-  ipcMain.handle(IPC_CHANNELS.RELEASES_LIST, () => listReleases())
+  ipcMain.handle(IPC_CHANNELS.RELEASES_LIST, (_event, offset?: number, limit?: number) =>
+    listReleases(offset, limit)
+  )
   ipcMain.handle(IPC_CHANNELS.RELEASES_CREATE, (_event, input: ReleaseInput) =>
     createRelease(input)
   )
@@ -23,6 +26,9 @@ export function registerReleaseHandlers(): void {
     updateRelease(id, input)
   )
   ipcMain.handle(IPC_CHANNELS.RELEASES_DELETE, (_event, id: string) => deleteRelease(id))
+  ipcMain.handle(IPC_CHANNELS.RELEASES_LIST_TRACKS, (_event, albumId: string) =>
+    listReleaseTracks(albumId)
+  )
   ipcMain.handle(IPC_CHANNELS.RELEASES_LIST_ARTISTS, () => listArtists())
   ipcMain.handle(IPC_CHANNELS.RELEASES_CREATE_ARTIST, (_event, name: string) => createArtist(name))
   ipcMain.handle(IPC_CHANNELS.RELEASES_UPLOAD_ASSET, (_event, input: UploadAssetInput) =>

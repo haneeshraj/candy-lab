@@ -1,5 +1,6 @@
-import { useMemo, useState } from 'react'
+import { useMemo, useRef, useState } from 'react'
 import { Button, ConfirmDialog, TextField } from '@renderer/components/ui'
+import { useIntersectionObserver } from '@renderer/hooks'
 import { ReleaseCard } from './components/ReleaseCard'
 import { ReleaseDetailModal } from './components/ReleaseDetailModal'
 import { ReleaseFormModal } from './components/ReleaseFormModal'
@@ -10,8 +11,14 @@ import styles from './Releases.module.scss'
 
 /** Releases dashboard: searchable catalog with create/edit/delete flows. */
 export default function Releases(): React.JSX.Element {
-  const { releases, loading, error, reload } = useReleases()
+  const { releases, total, loading, loadingMore, hasMore, error, loadMore, reload } = useReleases()
   const [query, setQuery] = useState('')
+
+  // Sentinel at the end of the grid: when it scrolls into view, pull the next
+  // page. Kept mounted while `hasMore` (and no load-more error), so a short
+  // filtered result keeps loading pages to search the full catalog.
+  const sentinelRef = useRef<HTMLDivElement>(null)
+  useIntersectionObserver(sentinelRef, () => void loadMore(), { rootMargin: '400px' })
 
   const [viewing, setViewing] = useState<Release | null>(null)
   const [formOpen, setFormOpen] = useState(false)
@@ -67,7 +74,7 @@ export default function Releases(): React.JSX.Element {
         <div>
           <h1 className={styles.title}>Releases</h1>
           <p className={styles.subtitle}>
-            {releases.length} {releases.length === 1 ? 'release' : 'releases'} in your catalog
+            {total} {total === 1 ? 'release' : 'releases'} in your catalog
           </p>
         </div>
         <Button onClick={openAdd}>+ Add Release</Button>
@@ -85,7 +92,7 @@ export default function Releases(): React.JSX.Element {
 
       {loading ? (
         <p className={styles.state}>Loading releases…</p>
-      ) : error ? (
+      ) : error && releases.length === 0 ? (
         <div className={styles.state}>
           <p className={styles.error}>{error}</p>
           <Button variant="secondary" onClick={() => void reload()}>
@@ -97,14 +104,34 @@ export default function Releases(): React.JSX.Element {
           <p>No releases yet.</p>
           <Button onClick={openAdd}>Add your first release</Button>
         </div>
-      ) : filtered.length === 0 ? (
-        <p className={styles.state}>No releases match “{query}”.</p>
       ) : (
-        <div className={styles.grid}>
-          {filtered.map((release) => (
-            <ReleaseCard key={release.id} release={release} onOpen={setViewing} />
-          ))}
-        </div>
+        <>
+          {filtered.length > 0 ? (
+            <div className={styles.grid}>
+              {filtered.map((release) => (
+                <ReleaseCard key={release.id} release={release} onOpen={setViewing} />
+              ))}
+            </div>
+          ) : (
+            // Nothing loaded so far matches; if more pages remain the sentinel
+            // below keeps loading them, otherwise this is the final answer.
+            !hasMore && <p className={styles.state}>No releases match “{query}”.</p>
+          )}
+
+          {hasMore &&
+            (error ? (
+              <div className={styles.state}>
+                <p className={styles.error}>{error}</p>
+                <Button variant="secondary" onClick={() => void loadMore()}>
+                  Retry
+                </Button>
+              </div>
+            ) : (
+              <div ref={sentinelRef} className={styles.sentinel}>
+                {loadingMore && <span>Loading more…</span>}
+              </div>
+            ))}
+        </>
       )}
 
       <ReleaseDetailModal
@@ -118,6 +145,9 @@ export default function Releases(): React.JSX.Element {
           setViewing(null)
           requestDelete(release)
         }}
+        // Drilling into an album's track swaps the detail view to that track,
+        // reusing the same modal (and its open animation).
+        onOpenTrack={setViewing}
       />
 
       <ReleaseFormModal

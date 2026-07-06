@@ -48,10 +48,23 @@ create table if not exists public.release_artists (
   primary key (release_id, artist_id)
 );
 
+-- ── Album/EP ↔ Track junction (self-referencing) ─────────────────────────────
+-- An Album or EP (album_id) owns an ordered list of child track releases
+-- (track_id). Tracks are real `releases` rows and may appear on multiple albums.
+create table if not exists public.release_tracks (
+  album_id uuid not null references public.releases (id) on delete cascade,
+  track_id uuid not null references public.releases (id) on delete cascade,
+  position int not null default 0,
+  primary key (album_id, track_id),
+  constraint release_tracks_no_self check (album_id <> track_id)
+);
+
 -- Helpful indexes for search / filtering as the catalog grows.
 create index if not exists releases_created_at_idx on public.releases (created_at desc);
 create index if not exists releases_project_type_idx on public.releases (project_type);
 create index if not exists release_artists_artist_idx on public.release_artists (artist_id);
+create index if not exists release_tracks_album_idx on public.release_tracks (album_id, position);
+create index if not exists release_tracks_track_idx on public.release_tracks (track_id);
 
 -- ── Row Level Security ───────────────────────────────────────────────────────
 -- Enabled with no policies: anon/authenticated clients get nothing. The app's
@@ -59,6 +72,7 @@ create index if not exists release_artists_artist_idx on public.release_artists 
 alter table public.releases        enable row level security;
 alter table public.artists         enable row level security;
 alter table public.release_artists enable row level security;
+alter table public.release_tracks  enable row level security;
 
 -- ===========================================================================
 -- Storage bucket for media (cover art + Spotify canvas videos)

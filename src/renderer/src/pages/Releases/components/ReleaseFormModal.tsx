@@ -2,10 +2,12 @@ import { useEffect, useRef, useState } from 'react'
 import { Modal } from '@renderer/components/Modal'
 import { Button, Checkbox, FileField, Select, TagInput, TextField } from '@renderer/components/ui'
 import { useArtists } from '../hooks/useArtists'
-import { PLATFORMS, PROJECT_TYPES } from '../constants'
+import { useTrackOptions } from '../hooks/useTrackOptions'
+import { isMultiTrack, PLATFORMS, PROJECT_TYPES } from '../constants'
 import type { ProjectType, Release, ReleaseInput } from '../types'
 import { errorMessage } from '../utils'
 import { ArtistSelect } from './ArtistSelect'
+import { TrackSelect } from './TrackSelect'
 import { PlatformLinksField } from './PlatformLinksField'
 import { prepareCanvas, prepareCoverArt } from '../media'
 import styles from './ReleaseFormModal.module.scss'
@@ -29,6 +31,7 @@ function initialForm(release: Release | null): {
   projectType: ProjectType | ''
   releaseDate: string
   artistIds: string[]
+  trackIds: string[]
   genres: string[]
   platformLinks: Record<string, string>
   visualLink: string
@@ -40,6 +43,7 @@ function initialForm(release: Release | null): {
     projectType: release?.projectType ?? '',
     releaseDate: release?.releaseDate ?? '',
     artistIds: release ? release.artists.map((artist) => artist.id) : [],
+    trackIds: release?.trackIds ?? [],
     genres: release?.genres ?? [],
     platformLinks: release?.platformLinks ?? {},
     visualLink: release?.visualLink ?? '',
@@ -76,6 +80,14 @@ function ReleaseForm({
   const { artists, addArtist } = useArtists()
 
   const [form, setForm] = useState(() => initialForm(release))
+
+  // Track linking only applies to Albums/EPs — load the pickable pool lazily
+  // (and exclude this release, so it can't be a track of itself).
+  const showTracks = isMultiTrack(form.projectType)
+  const { options: trackOptions, loading: trackOptionsLoading } = useTrackOptions(
+    showTracks,
+    release?.id
+  )
 
   // Media: a newly-picked File replaces the existing URL on save. Track both so
   // "keep current", "replace", and "remove" are all expressible.
@@ -192,7 +204,10 @@ function ReleaseForm({
         coverArtUrl,
         canvasUrl: finalCanvasUrl,
         previewEnabled: form.previewEnabled,
-        artistIds: form.artistIds
+        artistIds: form.artistIds,
+        // Only Albums/EPs carry a tracklist; the service ignores it otherwise,
+        // but keep the payload clean so a type change drops stale links.
+        trackIds: isMultiTrack(form.projectType) ? form.trackIds : []
       }
 
       if (release) await window.api.releases.update(release.id, payload)
@@ -235,6 +250,16 @@ function ReleaseForm({
         onChange={(ids) => patch('artistIds', ids)}
         onCreate={addArtist}
       />
+
+      {showTracks && (
+        <TrackSelect
+          label="Tracks"
+          options={trackOptions}
+          selectedIds={form.trackIds}
+          onChange={(ids) => patch('trackIds', ids)}
+          loading={trackOptionsLoading}
+        />
+      )}
 
       <TagInput
         label="Genres"

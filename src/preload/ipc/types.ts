@@ -124,6 +124,12 @@ export interface Release {
   /** ISO timestamp. */
   createdAt: string
   artists: Artist[]
+  /**
+   * IDs of the child track releases, ordered, when this is an Album or EP.
+   * Empty for every other project type. Use `releases.tracks(id)` to resolve
+   * the full track records for display.
+   */
+  trackIds: string[]
 }
 
 /** Payload for creating a release. Artists are referenced by id (create them
@@ -140,6 +146,20 @@ export interface ReleaseInput {
   canvasUrl: string | null
   previewEnabled: boolean
   artistIds: string[]
+  /**
+   * Ordered IDs of the child track releases for an Album or EP. Each must be an
+   * existing release row. Ignored (treated as empty) for other project types.
+   */
+  trackIds: string[]
+}
+
+/** One page of releases plus the metadata infinite scroll needs. */
+export interface ReleasePage {
+  releases: Release[]
+  /** Total number of releases in the catalog, across all pages. */
+  total: number
+  /** Whether more releases remain beyond this page. */
+  hasMore: boolean
 }
 
 /** A media file to upload to Supabase Storage. */
@@ -151,14 +171,23 @@ export interface UploadAssetInput {
 }
 
 export interface ReleasesApi {
-  /** All releases, newest first, with their artist credits. */
-  list: () => Promise<Release[]>
+  /**
+   * A page of releases, newest first, with their artist credits. Pass `offset`
+   * (rows to skip) and `limit` (page size) for infinite scroll; both default to
+   * the first page. The result carries the catalog `total` and a `hasMore` flag.
+   */
+  list: (offset?: number, limit?: number) => Promise<ReleasePage>
   /** Create a release (and its artist relations). Returns the created row. */
   create: (input: ReleaseInput) => Promise<Release>
   /** Update a release (and its artist relations). Returns the updated row. */
   update: (id: string, input: ReleaseInput) => Promise<Release>
   /** Delete a release, its relations, and its media. */
   remove: (id: string) => Promise<void>
+  /**
+   * The child track releases of an Album or EP, in tracklist order, each with
+   * its own artist credits. Returns an empty array for non-album/EP releases.
+   */
+  tracks: (albumId: string) => Promise<Release[]>
   /** All artists, alphabetical — cache for the multi-select dropdown. */
   listArtists: () => Promise<Artist[]>
   /** Get-or-create an artist by name (case-insensitive, no duplicates). */

@@ -40,10 +40,11 @@ export const IPC_CHANNELS = {
   ACCESS_UPDATE_USER: 'access:update-user', // invoke(id, changes) → Profile
 
   // Releases (music catalog CMS)
-  RELEASES_LIST: 'releases:list', // invoke → Release[]
+  RELEASES_LIST: 'releases:list', // invoke(offset?, limit?) → ReleasePage
   RELEASES_CREATE: 'releases:create', // invoke(ReleaseInput) → Release
   RELEASES_UPDATE: 'releases:update', // invoke(id, ReleaseInput) → Release
   RELEASES_DELETE: 'releases:delete', // invoke(id) → void
+  RELEASES_LIST_TRACKS: 'releases:list-tracks', // invoke(albumId) → Release[]
   RELEASES_LIST_ARTISTS: 'releases:list-artists', // invoke → Artist[]
   RELEASES_CREATE_ARTIST: 'releases:create-artist', // invoke(name) → Artist
   RELEASES_UPLOAD_ASSET: 'releases:upload-asset' // invoke(UploadAssetInput) → string (URL)

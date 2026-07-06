@@ -15,6 +15,13 @@ export const PROJECT_TYPE_LABELS: Record<ProjectType, string> = Object.fromEntri
   PROJECT_TYPES.map((option) => [option.value, option.label])
 ) as Record<ProjectType, string>
 
+/** Whether a project type owns a tracklist (Album/EP) vs. being a standalone
+ * release. Drives the conditional track section in the form and the two-column
+ * detail layout. */
+export function isMultiTrack(type: ProjectType | ''): boolean {
+  return type === 'album' || type === 'ep'
+}
+
 /** Supported distribution / streaming platforms. */
 export const PLATFORMS: ReleasePlatform[] = [
   'Spotify',

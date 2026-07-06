@@ -1,7 +1,13 @@
 import { randomUUID } from 'crypto'
 import { getSupabase, MEDIA_BUCKET } from './supabase.service'
 import { logger } from '../utils/logger'
-import type { Artist, Release, ReleaseInput, UploadAssetInput } from '../../preload/ipc/types'
+import type {
+  Artist,
+  Release,
+  ReleaseInput,
+  ReleasePage,
+  UploadAssetInput
+} from '../../preload/ipc/types'
 
 // Business logic for the Releases CMS. All Supabase access is funneled through
 // here (via `supabase.service`), keeping handlers thin and the renderer clear of
@@ -24,10 +30,19 @@ interface ReleaseRow {
   preview_enabled: boolean
   created_at: string
   release_artists?: { artists: Artist | null }[] | null
+  // Child track links where this release is the album (see `release_tracks`).
+  release_tracks?: { track_id: string; position: number }[] | null
 }
 
-// Columns to select, including the nested artist credits in one round-trip.
-const RELEASE_SELECT = '*, release_artists(artists(id, name))'
+// Columns to select, including the nested artist credits and (for albums/EPs)
+// the child track links in one round-trip. `release_tracks!album_id` disambiguates
+// the two FKs back to `releases` — we want the rows where this release is the album.
+const RELEASE_SELECT =
+  '*, release_artists(artists(id, name)), release_tracks!album_id(track_id, position)'
+
+// Default page size for the paginated list; the renderer passes its own, this
+// is just a safe fallback for callers that don't.
+const DEFAULT_PAGE_SIZE = 24
 
 /** Keep only platform entries that have a non-empty (trimmed) URL. */
 function cleanPlatformLinks(links: Record<string, string>): Record<string, string> {
@@ -55,22 +70,83 @@ function mapRelease(row: ReleaseRow): Release {
     createdAt: row.created_at,
     artists: (row.release_artists ?? [])
       .map((link) => link.artists)
-      .filter((artist): artist is Artist => artist !== null)
+      .filter((artist): artist is Artist => artist !== null),
+    trackIds: (row.release_tracks ?? [])
+      .slice()
+      .sort((a, b) => a.position - b.position)
+      .map((link) => link.track_id)
   }
 }
 
-/** All releases, newest first, with artist credits. */
-export async function listReleases(): Promise<Release[]> {
-  const { data, error } = await getSupabase()
+/** Album/EP releases own tracks; every other type never does. */
+function ownsTracks(type: Release['projectType']): boolean {
+  return type === 'album' || type === 'ep'
+}
+
+/**
+ * Resync an album's track links: clear then re-insert the current selection in
+ * order (`position` = index). Non-album/EP releases are forced to an empty list,
+ * so changing a release's type away from Album/EP drops any stale links.
+ */
+async function syncTrackLinks(
+  supabase: ReturnType<typeof getSupabase>,
+  albumId: string,
+  input: ReleaseInput
+): Promise<void> {
+  const { error: clearError } = await supabase
+    .from('release_tracks')
+    .delete()
+    .eq('album_id', albumId)
+  if (clearError) {
+    logger.error('syncTrackLinks clear failed', clearError)
+    throw new Error(clearError.message)
+  }
+
+  if (!ownsTracks(input.projectType)) return
+
+  // Dedupe, drop any self-reference, preserve the chosen order.
+  const trackIds = [...new Set(input.trackIds)].filter((id) => id !== albumId)
+  if (trackIds.length === 0) return
+
+  const { error: linkError } = await supabase.from('release_tracks').insert(
+    trackIds.map((trackId, index) => ({
+      album_id: albumId,
+      track_id: trackId,
+      position: index
+    }))
+  )
+  if (linkError) {
+    logger.error('syncTrackLinks insert failed', linkError)
+    throw new Error(linkError.message)
+  }
+}
+
+/**
+ * A page of releases, newest release date first, with artist credits. `offset`
+ * rows are skipped and up to `limit` rows returned — the renderer walks these
+ * for infinite scroll. The exact total is fetched alongside so we can report
+ * the catalog size and know when the last page has been reached.
+ */
+export async function listReleases(offset = 0, limit = DEFAULT_PAGE_SIZE): Promise<ReleasePage> {
+  const { data, error, count } = await getSupabase()
     .from('releases')
-    .select(RELEASE_SELECT)
+    .select(RELEASE_SELECT, { count: 'exact' })
+    .order('release_date', { ascending: false, nullsFirst: false })
     .order('created_at', { ascending: false })
+    .range(offset, offset + limit - 1)
 
   if (error) {
     logger.error('listReleases failed', error)
     throw new Error(error.message)
   }
-  return (data as ReleaseRow[]).map(mapRelease)
+
+  const rows = data as ReleaseRow[]
+  const total = count ?? offset + rows.length
+  return {
+    releases: rows.map(mapRelease),
+    total,
+    hasMore: offset + rows.length < total
+  }
 }
 
 async function getReleaseById(id: string): Promise<Release> {
@@ -132,6 +208,15 @@ export async function createRelease(input: ReleaseInput): Promise<Release> {
     }
   }
 
+  // Parent first, then its child tracks: the release now exists, so the junction
+  // rows reference a real album alongside the (already-existing) track releases.
+  try {
+    await syncTrackLinks(supabase, releaseId, input)
+  } catch (err) {
+    await supabase.from('releases').delete().eq('id', releaseId)
+    throw err
+  }
+
   return getReleaseById(releaseId)
 }
 
@@ -191,8 +276,49 @@ export async function updateRelease(id: string, input: ReleaseInput): Promise<Re
     }
   }
 
+  await syncTrackLinks(supabase, id, input)
+
   await removeAssets(staleAssets)
   return getReleaseById(id)
+}
+
+/**
+ * The child track releases of an Album or EP, in tracklist order, each with its
+ * own artist credits — the album/EP detail view's right-hand list. Resolved in
+ * two round-trips (link ids, then the releases), reordered to match `position`
+ * since `.in()` doesn't preserve order.
+ */
+export async function listReleaseTracks(albumId: string): Promise<Release[]> {
+  const supabase = getSupabase()
+
+  const { data: links, error: linkError } = await supabase
+    .from('release_tracks')
+    .select('track_id, position')
+    .eq('album_id', albumId)
+    .order('position', { ascending: true })
+
+  if (linkError) {
+    logger.error('listReleaseTracks link fetch failed', linkError)
+    throw new Error(linkError.message)
+  }
+
+  const orderedIds = (links as { track_id: string }[]).map((link) => link.track_id)
+  if (orderedIds.length === 0) return []
+
+  const { data, error } = await supabase
+    .from('releases')
+    .select(RELEASE_SELECT)
+    .in('id', orderedIds)
+
+  if (error) {
+    logger.error('listReleaseTracks releases fetch failed', error)
+    throw new Error(error.message)
+  }
+
+  const byId = new Map((data as ReleaseRow[]).map((row) => [row.id, mapRelease(row)]))
+  return orderedIds
+    .map((trackId) => byId.get(trackId))
+    .filter((release): release is Release => release !== undefined)
 }
 
 /** Delete a release (relations cascade) and remove its media from storage. */

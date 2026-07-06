@@ -15,3 +15,6 @@ certs/
 
 # Local Claude Code tooling config
 .claude/
+
+
+ARCHITECTURE.md

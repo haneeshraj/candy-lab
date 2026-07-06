@@ -8,7 +8,8 @@ import {
   useReducedMotionSafe
 } from '@renderer/animations'
 import { IconClose, IconEdit, IconTrash } from '../../../assets/icons'
-import { PROJECT_TYPE_LABELS } from '../constants'
+import { isMultiTrack, PROJECT_TYPE_LABELS } from '../constants'
+import { useReleaseTracks } from '../hooks/useReleaseTracks'
 import type { Release } from '../types'
 import { formatReleaseDate } from '../utils'
 import styles from './ReleaseDetailModal.module.scss'
@@ -19,6 +20,8 @@ interface ReleaseDetailModalProps {
   onClose: () => void
   onEdit: (release: Release) => void
   onDelete: (release: Release) => void
+  /** Open another release's detail view (used to drill into an album's tracks). */
+  onOpenTrack: (release: Release) => void
 }
 
 const openExternal = (url: string): void => {
@@ -26,20 +29,175 @@ const openExternal = (url: string): void => {
 }
 
 /**
- * Full-bleed detail view for a release: the Spotify canvas video plays behind a
- * dark overlay (falls back to blurred cover art), with the cover + track details
- * pinned to the bottom and edit/delete actions in the top bar.
+ * The visual "stage": the Spotify canvas video (or blurred cover art) with the
+ * cover + track details pinned to the bottom. It fills its container, so it's
+ * the whole dialog for a standalone release and the left column for an Album/EP.
+ */
+function ReleaseStage({ release }: { release: Release }): React.JSX.Element {
+  const artistNames = release.artists.map((artist) => artist.name).join(', ')
+  const date = formatReleaseDate(release.releaseDate)
+
+  return (
+    <div className={styles.stage}>
+      {/* Background: canvas video, else blurred cover art, else gradient. */}
+      {release.canvasUrl ? (
+        <video className={styles.media} src={release.canvasUrl} autoPlay loop muted playsInline />
+      ) : release.coverArtUrl ? (
+        <img className={`${styles.media} ${styles.blur}`} src={release.coverArtUrl} alt="" />
+      ) : null}
+      <div className={styles.overlay} />
+
+      <div className={styles.bottom}>
+        <div className={styles.cover}>
+          {release.coverArtUrl ? (
+            <img className={styles.coverArt} src={release.coverArtUrl} alt="" />
+          ) : (
+            <span className={styles.coverPlaceholder} aria-hidden>
+              ♪
+            </span>
+          )}
+        </div>
+
+        <div className={styles.info}>
+          <div className={styles.titleRow}>
+            <h2 className={styles.name}>{release.projectName}</h2>
+            <span className={styles.type}>{PROJECT_TYPE_LABELS[release.projectType]}</span>
+            {release.previewEnabled && <span className={styles.live}>● Live</span>}
+          </div>
+
+          {artistNames && <p className={styles.artists}>{artistNames}</p>}
+          {date && <p className={styles.date}>{date}</p>}
+
+          {release.genres.length > 0 && (
+            <div className={styles.tags}>
+              {release.genres.map((genre) => (
+                <span key={genre} className={styles.tag}>
+                  {genre}
+                </span>
+              ))}
+            </div>
+          )}
+
+          {Object.keys(release.platformLinks).length > 0 && (
+            <div className={styles.links}>
+              {Object.entries(release.platformLinks).map(([platform, url]) => (
+                <button
+                  key={platform}
+                  type="button"
+                  className={styles.link}
+                  onClick={() => openExternal(url)}
+                >
+                  {platform}
+                </button>
+              ))}
+            </div>
+          )}
+
+          {(release.visualLink || release.masterLink) && (
+            <div className={styles.links}>
+              {release.visualLink && (
+                <button
+                  type="button"
+                  className={styles.link}
+                  onClick={() => openExternal(release.visualLink as string)}
+                >
+                  Visual
+                </button>
+              )}
+              {release.masterLink && (
+                <button
+                  type="button"
+                  className={styles.link}
+                  onClick={() => openExternal(release.masterLink as string)}
+                >
+                  Master
+                </button>
+              )}
+            </div>
+          )}
+        </div>
+      </div>
+    </div>
+  )
+}
+
+/**
+ * The right-hand tracklist for an Album/EP: a row-wise list of the linked track
+ * releases. Clicking a row opens that track's own detail view via `onOpenTrack`.
+ */
+function TrackList({
+  album,
+  onOpenTrack
+}: {
+  album: Release
+  onOpenTrack: (release: Release) => void
+}): React.JSX.Element {
+  const { tracks, loading, error } = useReleaseTracks(album)
+
+  return (
+    <div className={styles.tracks}>
+      <div className={styles.tracksHead}>
+        <h3 className={styles.tracksTitle}>Tracks</h3>
+        {tracks.length > 0 && <span className={styles.tracksCount}>{tracks.length}</span>}
+      </div>
+
+      <div className={styles.trackScroll}>
+        {loading ? (
+          <p className={styles.tracksState}>Loading tracks…</p>
+        ) : error ? (
+          <p className={`${styles.tracksState} ${styles.tracksError}`}>{error}</p>
+        ) : tracks.length === 0 ? (
+          <p className={styles.tracksState}>No tracks linked yet.</p>
+        ) : (
+          <ul className={styles.trackRows}>
+            {tracks.map((track, index) => (
+              <li key={track.id}>
+                <button
+                  type="button"
+                  className={styles.trackRow}
+                  onClick={() => onOpenTrack(track)}
+                >
+                  <span className={styles.trackIndex}>{index + 1}</span>
+                  <span className={styles.trackThumb}>
+                    {track.coverArtUrl ? (
+                      <img src={track.coverArtUrl} alt="" />
+                    ) : (
+                      <span aria-hidden>♪</span>
+                    )}
+                  </span>
+                  <span className={styles.trackMeta}>
+                    <span className={styles.trackName}>{track.projectName}</span>
+                    {track.artists.length > 0 && (
+                      <span className={styles.trackArtists}>
+                        {track.artists.map((artist) => artist.name).join(', ')}
+                      </span>
+                    )}
+                  </span>
+                  <span className={styles.trackType}>{PROJECT_TYPE_LABELS[track.projectType]}</span>
+                </button>
+              </li>
+            ))}
+          </ul>
+        )}
+      </div>
+    </div>
+  )
+}
+
+/**
+ * Full-bleed detail view for a release. Standalone releases show the stage alone;
+ * Albums and EPs use a two-column layout — the stage on the left, a scrollable
+ * tracklist on the right whose rows drill into each track's own detail view.
  */
 export function ReleaseDetailModal({
   release,
   onClose,
   onEdit,
-  onDelete
+  onDelete,
+  onOpenTrack
 }: ReleaseDetailModalProps): React.JSX.Element {
   const reduced = useReducedMotionSafe()
-
-  const artistNames = release?.artists.map((artist) => artist.name).join(', ') ?? ''
-  const date = release ? formatReleaseDate(release.releaseDate) : ''
+  const isAlbum = release ? isMultiTrack(release.projectType) : false
 
   return createPortal(
     <AnimatePresence>
@@ -53,25 +211,10 @@ export function ReleaseDetailModal({
             role="dialog"
             aria-modal="true"
             aria-label={release.projectName}
-            className={styles.dialog}
+            className={`${styles.dialog} ${isAlbum ? styles.album : ''}`}
             onClick={(event) => event.stopPropagation()}
             {...motionSafePreset(modalContent, reduced)}
           >
-            {/* Background: canvas video, else blurred cover art, else gradient. */}
-            {release.canvasUrl ? (
-              <video
-                className={styles.media}
-                src={release.canvasUrl}
-                autoPlay
-                loop
-                muted
-                playsInline
-              />
-            ) : release.coverArtUrl ? (
-              <img className={`${styles.media} ${styles.blur}`} src={release.coverArtUrl} alt="" />
-            ) : null}
-            <div className={styles.overlay} />
-
             <div className={styles.topbar}>
               <button
                 type="button"
@@ -99,76 +242,14 @@ export function ReleaseDetailModal({
               </button>
             </div>
 
-            <div className={styles.bottom}>
-              <div className={styles.cover}>
-                {release.coverArtUrl ? (
-                  <img className={styles.coverArt} src={release.coverArtUrl} alt="" />
-                ) : (
-                  <span className={styles.coverPlaceholder} aria-hidden>
-                    ♪
-                  </span>
-                )}
+            {isAlbum ? (
+              <div className={styles.columns}>
+                <ReleaseStage release={release} />
+                <TrackList album={release} onOpenTrack={onOpenTrack} />
               </div>
-
-              <div className={styles.info}>
-                <div className={styles.titleRow}>
-                  <h2 className={styles.name}>{release.projectName}</h2>
-                  <span className={styles.type}>{PROJECT_TYPE_LABELS[release.projectType]}</span>
-                  {release.previewEnabled && <span className={styles.live}>● Live</span>}
-                </div>
-
-                {artistNames && <p className={styles.artists}>{artistNames}</p>}
-                {date && <p className={styles.date}>{date}</p>}
-
-                {release.genres.length > 0 && (
-                  <div className={styles.tags}>
-                    {release.genres.map((genre) => (
-                      <span key={genre} className={styles.tag}>
-                        {genre}
-                      </span>
-                    ))}
-                  </div>
-                )}
-
-                {Object.keys(release.platformLinks).length > 0 && (
-                  <div className={styles.links}>
-                    {Object.entries(release.platformLinks).map(([platform, url]) => (
-                      <button
-                        key={platform}
-                        type="button"
-                        className={styles.link}
-                        onClick={() => openExternal(url)}
-                      >
-                        {platform}
-                      </button>
-                    ))}
-                  </div>
-                )}
-
-                {(release.visualLink || release.masterLink) && (
-                  <div className={styles.links}>
-                    {release.visualLink && (
-                      <button
-                        type="button"
-                        className={styles.link}
-                        onClick={() => openExternal(release.visualLink as string)}
-                      >
-                        Visual
-                      </button>
-                    )}
-                    {release.masterLink && (
-                      <button
-                        type="button"
-                        className={styles.link}
-                        onClick={() => openExternal(release.masterLink as string)}
-                      >
-                        Master
-                      </button>
-                    )}
-                  </div>
-                )}
-              </div>
-            </div>
+            ) : (
+              <ReleaseStage release={release} />
+            )}
           </motion.div>
         </motion.div>
       )}

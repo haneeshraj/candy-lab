@@ -25,6 +25,14 @@ export interface Release {
   previewEnabled: boolean
   createdAt: string
   artists: Artist[]
+  /** Ordered IDs of the child track releases (Album/EP only; empty otherwise). */
+  trackIds: string[]
+}
+
+export interface ReleasePage {
+  releases: Release[]
+  total: number
+  hasMore: boolean
 }
 
 export interface ReleaseInput {
@@ -39,4 +47,6 @@ export interface ReleaseInput {
   canvasUrl: string | null
   previewEnabled: boolean
   artistIds: string[]
+  /** Ordered IDs of the child track releases for an Album/EP (empty otherwise). */
+  trackIds: string[]
 }

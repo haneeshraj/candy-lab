@@ -17,9 +17,6 @@
 
 .dialog {
   position: relative;
-  display: flex;
-  flex-direction: column;
-  justify-content: flex-end;
   width: 100%;
   max-width: rem(420px);
   aspect-ratio: 9 / 16;
@@ -28,6 +25,37 @@
   background-color: $surface;
   border-radius: $radius-lg;
   box-shadow: $shadow-xl;
+}
+
+// Album/EP: widen the dialog and drop the fixed aspect so the two columns (a
+// 9:16 stage + a flexible tracklist) can sit side by side at a fixed height.
+.album {
+  max-width: rem(840px);
+  aspect-ratio: auto;
+  height: min(rem(660px), calc(100vh - #{space(12)}));
+}
+
+.columns {
+  display: flex;
+  height: 100%;
+}
+
+// The visual stage fills the dialog for a standalone release; inside `.album`
+// it becomes the left column, keeping its 9:16 shape driven off the height.
+.stage {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  justify-content: flex-end;
+  width: 100%;
+  height: 100%;
+  overflow: hidden;
+
+  .album & {
+    flex-shrink: 0;
+    width: auto;
+    aspect-ratio: 9 / 16;
+  }
 }
 
 .media {
@@ -196,5 +224,171 @@
 
   @include hover {
     background-color: rgb(255 255 255 / 24%);
+  }
+}
+
+// ── Album/EP tracklist (right column) ─────────────────────────────────────────
+// Unlike the stage, this column sits on the themed `$surface`, so it uses the
+// regular theme tokens (readable in both light and dark) rather than the fixed
+// light-on-dark values above.
+.tracks {
+  display: flex;
+  flex: 1;
+  flex-direction: column;
+  min-width: 0;
+  background-color: $surface;
+  border-left: $border-width solid $border;
+}
+
+.tracksHead {
+  display: flex;
+  gap: space(2);
+  align-items: center;
+  padding: space(4) space(5);
+  border-bottom: $border-width solid $border;
+}
+
+.tracksTitle {
+  font-size: $font-size-md;
+  font-weight: $font-weight-semibold;
+  color: $text-primary;
+}
+
+.tracksCount {
+  @include flex-center;
+
+  min-width: rem(22px);
+  height: rem(22px);
+  padding-inline: space(2);
+  font-size: $font-size-xs;
+  color: $text-secondary;
+  background-color: with-alpha($primary, 0.14);
+  border-radius: $radius-pill;
+}
+
+.trackScroll {
+  flex: 1;
+  padding: space(2);
+  overflow-y: auto;
+
+  @include scrollbar;
+}
+
+.tracksState {
+  padding: space(4) space(3);
+  font-size: $font-size-sm;
+  color: $text-secondary;
+  text-align: center;
+}
+
+.tracksError {
+  color: $error;
+}
+
+.trackRows {
+  display: flex;
+  flex-direction: column;
+  gap: space(1);
+  padding: 0;
+  margin: 0;
+  list-style: none;
+}
+
+.trackRow {
+  display: flex;
+  gap: space(3);
+  align-items: center;
+  width: 100%;
+  padding: space(2) space(3);
+  text-align: left;
+  cursor: pointer;
+  background: none;
+  border: none;
+  border-radius: $radius-md;
+  transition: $transition-colors;
+
+  @include hover {
+    background-color: with-alpha($primary, 0.1);
+  }
+}
+
+.trackIndex {
+  flex-shrink: 0;
+  width: rem(20px);
+  font-size: $font-size-xs;
+  color: $text-secondary;
+  text-align: center;
+}
+
+.trackThumb {
+  @include flex-center;
+  @include size(rem(40px));
+
+  flex-shrink: 0;
+  overflow: hidden;
+  font-size: $font-size-md;
+  color: $text-secondary;
+  background-color: $background;
+  border: $border-width solid $border;
+  border-radius: $radius-sm;
+
+  img {
+    @include size(100%);
+
+    object-fit: cover;
+  }
+}
+
+.trackMeta {
+  display: flex;
+  flex-direction: column;
+  gap: rem(2px);
+  min-width: 0;
+}
+
+.trackName {
+  overflow: hidden;
+  font-size: $font-size-sm;
+  color: $text-primary;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.trackArtists {
+  overflow: hidden;
+  font-size: $font-size-xs;
+  color: $text-secondary;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.trackType {
+  flex-shrink: 0;
+  margin-left: auto;
+  padding: space(1) space(2);
+  font-size: $font-size-xs;
+  color: $text-secondary;
+  background-color: with-alpha($primary, 0.1);
+  border-radius: $radius-pill;
+}
+
+// On narrow viewports the two columns would be cramped — stack them.
+@include media-max(sm) {
+  .album {
+    height: min(rem(720px), calc(100vh - #{space(12)}));
+  }
+
+  .columns {
+    flex-direction: column;
+  }
+
+  .album .stage {
+    width: 100%;
+    aspect-ratio: 9 / 16;
+  }
+
+  .tracks {
+    border-top: $border-width solid $border;
+    border-left: none;
   }
 }

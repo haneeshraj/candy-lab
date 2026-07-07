@@ -3,6 +3,7 @@ import { AppRouter } from '@renderer/router'
 import { TitleBar } from '../components/TitleBar'
 import { Sidebar } from '../components/Sidebar'
 import { AuthGate } from '../components/AuthGate'
+import { TransitionProvider } from '../components/PageTransition'
 import { useAppBootstrap } from './useAppBootstrap'
 import { useThemeSync } from './useThemeSync'
 import { useUpdaterSync } from './useUpdaterSync'
@@ -22,17 +23,19 @@ export function AppRoot(): React.JSX.Element {
 
   return (
     <HashRouter>
-      <div className="app-shell">
-        <TitleBar />
-        <AuthGate>
-          <div className="app-main">
-            <Sidebar />
-            <div className="app-body">
-              <AppRouter />
+      <TransitionProvider>
+        <div className="app-shell">
+          <TitleBar />
+          <AuthGate>
+            <div className="app-main">
+              <Sidebar />
+              <div className="app-body">
+                <AppRouter />
+              </div>
             </div>
-          </div>
-        </AuthGate>
-      </div>
+          </AuthGate>
+        </div>
+      </TransitionProvider>
     </HashRouter>
   )
 }

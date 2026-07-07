@@ -15,7 +15,8 @@ $z-layers: (
   popover: 1400,
   toast: 1500,
   tooltip: 1600,
-  titlebar: 1700
+  titlebar: 1700,
+  transition: 1800 // page-transition overlay — covers everything, title bar included
 );
 
 /// Return the z-index for a named layer.

@@ -1,0 +1,30 @@
+@use 'abstracts' as *;
+
+// The solid block that fronts a page transition. Pinned to the viewport with
+// `inset: 0` (not `100vw/100vh`, which would count the scrollbar and overflow),
+// stacked above the whole shell. `clip-path` is animated in JS to wipe it in
+// and out; it clips the label below along with the panel. `pointer-events` are
+// on so it swallows clicks while it's up.
+.overlay {
+  position: fixed;
+  inset: 0;
+  z-index: z(transition);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background-color: $primary; // solid brand fill — swap for whatever you like
+  pointer-events: auto;
+  will-change: clip-path;
+}
+
+// Centered text revealed by the wipe. It's a child of `.overlay`, so the
+// panel's `clip-path` clips it too — no separate mask needed.
+.label {
+  font-size: rem(64px);
+  font-weight: 700;
+  line-height: 1;
+  color: $background; // contrast against the brand fill — adjust to taste
+  text-transform: uppercase;
+  letter-spacing: 0.02em;
+  user-select: none;
+}

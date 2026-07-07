@@ -1,8 +1,8 @@
 import { useState } from 'react'
-import { NavLink } from 'react-router-dom'
 import { AnimatePresence, motion } from 'motion/react'
 
 import { motionSafePreset, sidebarTooltip } from '@renderer/animations'
+import { TransitionLink } from '@renderer/components/PageTransition'
 import styles from './Sidebar.module.scss'
 
 interface SidebarItemProps {
@@ -25,7 +25,7 @@ export function SidebarItem({ to, label, Icon, reduced }: SidebarItemProps): Rea
       onMouseEnter={() => setHovered(true)}
       onMouseLeave={() => setHovered(false)}
     >
-      <NavLink
+      <TransitionLink
         to={to}
         end
         className={({ isActive }) => `${styles.item} ${isActive ? styles.active : ''}`}
@@ -33,7 +33,7 @@ export function SidebarItem({ to, label, Icon, reduced }: SidebarItemProps): Rea
         <span className={styles.icon}>
           <Icon width={20} height={20} />
         </span>
-      </NavLink>
+      </TransitionLink>
 
       <AnimatePresence>
         {hovered && (

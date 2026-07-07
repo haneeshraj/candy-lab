@@ -1,11 +1,14 @@
 {
   "name": "candy-lab",
-  "version": "1.0.7",
-  "description": "An Electron application with React and TypeScript",
+  "productName": "Candy Lab",
+  "version": "1.0.9",
+  "description": "Candy Lab — brand CMS and content builder for the Candy Heist website.",
   "main": "./out/main/index.js",
-  "author": "example.com",
+  "author": {
+    "name": "Haneesh Raj Banisetti"
+  },
   "license": "MIT",
-  "homepage": "https://electron-vite.org",
+  "homepage": "https://github.com/haneeshraj/candy-lab",
   "scripts": {
     "format": "prettier --write .",
     "lint": "eslint --cache .",

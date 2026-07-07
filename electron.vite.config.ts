@@ -19,7 +19,7 @@ function gitCommit(): string {
 }
 
 const appInfo = {
-  name: pkg.name ?? '',
+  name: pkg.productName ?? pkg.name ?? '',
   version: pkg.version ?? '',
   description: pkg.description ?? '',
   author: typeof pkg.author === 'string' ? pkg.author : (pkg.author?.name ?? ''),

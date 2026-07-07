@@ -1,3 +1,4 @@
+import { useEffect, useState } from 'react'
 import { createPortal } from 'react-dom'
 import { AnimatePresence, motion } from 'motion/react'
 
@@ -7,11 +8,11 @@ import {
   motionSafePreset,
   useReducedMotionSafe
 } from '@renderer/animations'
-import { IconClose, IconEdit, IconTrash } from '../../../assets/icons'
+import { IconCheck, IconClose, IconEdit, IconLink, IconTrash } from '../../../assets/icons'
 import { isMultiTrack, PROJECT_TYPE_LABELS } from '../constants'
 import { useReleaseTracks } from '../hooks/useReleaseTracks'
 import type { Release } from '../types'
-import { formatReleaseDate } from '../utils'
+import { buildReleaseUrl, formatReleaseDate } from '../utils'
 import styles from './ReleaseDetailModal.module.scss'
 
 interface ReleaseDetailModalProps {
@@ -26,6 +27,36 @@ interface ReleaseDetailModalProps {
 
 const openExternal = (url: string): void => {
   void window.api.system.openExternal(url)
+}
+
+const resetCopyDelayMs = 1500
+
+async function copyText(text: string): Promise<boolean> {
+  try {
+    if (navigator.clipboard?.writeText) {
+      await navigator.clipboard.writeText(text)
+      return true
+    }
+  } catch {
+    // Fall through to the legacy fallback below.
+  }
+
+  const textarea = document.createElement('textarea')
+  textarea.value = text
+  textarea.setAttribute('readonly', 'true')
+  textarea.style.position = 'fixed'
+  textarea.style.opacity = '0'
+  document.body.appendChild(textarea)
+  textarea.select()
+
+  let copied = false
+  try {
+    copied = document.execCommand('copy')
+  } finally {
+    document.body.removeChild(textarea)
+  }
+
+  return copied
 }
 
 /**
@@ -197,7 +228,22 @@ export function ReleaseDetailModal({
   onOpenTrack
 }: ReleaseDetailModalProps): React.JSX.Element {
   const reduced = useReducedMotionSafe()
+  const [copied, setCopied] = useState(false)
   const isAlbum = release ? isMultiTrack(release.projectType) : false
+
+  useEffect(() => {
+    if (!copied) return undefined
+
+    const timeout = window.setTimeout(() => setCopied(false), resetCopyDelayMs)
+    return () => window.clearTimeout(timeout)
+  }, [copied])
+
+  const handleCopyLink = async (): Promise<void> => {
+    if (!release) return
+
+    const didCopy = await copyText(buildReleaseUrl(release))
+    if (didCopy) setCopied(true)
+  }
 
   return createPortal(
     <AnimatePresence>
@@ -216,6 +262,19 @@ export function ReleaseDetailModal({
             {...motionSafePreset(modalContent, reduced)}
           >
             <div className={styles.topbar}>
+              <button
+                type="button"
+                className={`${styles.iconButton} ${copied ? styles.copied : ''}`}
+                aria-label={copied ? 'Release link copied' : 'Copy release link'}
+                title={copied ? 'Copied' : 'Copy release link'}
+                onClick={() => void handleCopyLink()}
+              >
+                {copied ? (
+                  <IconCheck width={18} height={18} />
+                ) : (
+                  <IconLink width={18} height={18} />
+                )}
+              </button>
               <button
                 type="button"
                 className={styles.iconButton}

@@ -1,6 +1,23 @@
 import type { Release } from './types'
 import type { ReleaseFilters, SortKey } from './constants'
 
+export const RELEASE_PUBLIC_BASE_URL = 'https://candyheist.vercel.app'
+
+function slugifyReleaseName(name: string): string {
+  const normalized = name.normalize('NFKD').replace(/[\u0300-\u036f]/g, '')
+  const slug = normalized
+    .toLowerCase()
+    .trim()
+    .replace(/[^a-z0-9]+/g, '-')
+    .replace(/^-+|-+$/g, '')
+  return slug || 'release'
+}
+
+/** Build the public release page URL for a release. */
+export function buildReleaseUrl(release: Pick<Release, 'projectName'>): string {
+  return `${RELEASE_PUBLIC_BASE_URL}/release/${slugifyReleaseName(release.projectName)}`
+}
+
 /**
  * Extract a clean, user-facing message from an error. IPC errors surfaced by
  * Electron are prefixed (e.g. `Error invoking remote method 'x': Error: real`),

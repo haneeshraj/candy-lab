@@ -112,6 +112,16 @@
   }
 }
 
+.copied {
+  color: tint($success, 0.35);
+  border-color: tint($success, 0.35);
+
+  @include hover {
+    color: tint($success, 0.5);
+    border-color: tint($success, 0.5);
+  }
+}
+
 .bottom {
   position: relative;
   z-index: 2;

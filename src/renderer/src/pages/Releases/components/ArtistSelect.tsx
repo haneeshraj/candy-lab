@@ -8,13 +8,19 @@ interface ArtistSelectProps {
   artists: Artist[]
   selectedIds: string[]
   onChange: (ids: string[]) => void
-  /** Get-or-create an artist by name; returns the (existing or new) artist. */
-  onCreate: (name: string) => Promise<Artist>
+  /** Get-or-create an artist by name; returns the (existing or new) artist.
+   * Required unless `allowCreate` is false (e.g. when filtering). */
+  onCreate?: (name: string) => Promise<Artist>
+  /** Whether typing a new name offers to create it. Defaults to true; set false
+   * to use this purely as a searchable picker over existing artists. */
+  allowCreate?: boolean
+  /** Placeholder shown when nothing is selected. */
+  placeholder?: string
 }
 
 /**
  * Relational multi-select for artists: search the cached list, add existing
- * artists, or inline-create a new one (which is persisted via `onCreate`).
+ * artists, and (when `allowCreate`) inline-create a new one via `onCreate`.
  * Selected artists show as removable chips.
  */
 export function ArtistSelect({
@@ -22,7 +28,9 @@ export function ArtistSelect({
   artists,
   selectedIds,
   onChange,
-  onCreate
+  onCreate,
+  allowCreate = true,
+  placeholder = 'Search or add an artist…'
 }: ArtistSelectProps): React.JSX.Element {
   const containerRef = useRef<HTMLDivElement>(null)
   const [query, setQuery] = useState('')
@@ -41,7 +49,7 @@ export function ArtistSelect({
       !selectedIds.includes(artist.id) && artist.name.toLowerCase().includes(trimmed.toLowerCase())
   )
   const exactExists = artists.some((artist) => artist.name.toLowerCase() === trimmed.toLowerCase())
-  const canCreate = trimmed.length > 0 && !exactExists
+  const canCreate = allowCreate && Boolean(onCreate) && trimmed.length > 0 && !exactExists
 
   const add = (id: string): void => {
     if (!selectedIds.includes(id)) onChange([...selectedIds, id])
@@ -53,7 +61,7 @@ export function ArtistSelect({
   }
 
   const create = async (): Promise<void> => {
-    if (!canCreate || busy) return
+    if (!canCreate || busy || !onCreate) return
     setBusy(true)
     try {
       const artist = await onCreate(trimmed)
@@ -96,7 +104,7 @@ export function ArtistSelect({
         <input
           className={styles.input}
           value={query}
-          placeholder={selected.length === 0 ? 'Search or add an artist…' : undefined}
+          placeholder={selected.length === 0 ? placeholder : undefined}
           onChange={(event) => {
             setQuery(event.target.value)
             setOpen(true)

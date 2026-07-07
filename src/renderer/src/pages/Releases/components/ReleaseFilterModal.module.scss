@@ -1,0 +1,14 @@
+@use 'abstracts' as *;
+
+.body {
+  display: flex;
+  flex-direction: column;
+  gap: space(5);
+}
+
+.actions {
+  display: flex;
+  justify-content: flex-end;
+  gap: space(3);
+  padding-top: space(2);
+}

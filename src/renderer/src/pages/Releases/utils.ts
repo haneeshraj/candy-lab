@@ -1,3 +1,6 @@
+import type { Release } from './types'
+import type { ReleaseFilters, SortKey } from './constants'
+
 /**
  * Extract a clean, user-facing message from an error. IPC errors surfaced by
  * Electron are prefixed (e.g. `Error invoking remote method 'x': Error: real`),
@@ -9,6 +12,61 @@ export function errorMessage(error: unknown, fallback = 'Something went wrong.')
     return match ? match[1] : error.message
   }
   return fallback
+}
+
+/**
+ * Comparator for ordering releases by the chosen sort key. Releases without a
+ * release date always sink below dated ones (mirroring the service-side
+ * `nullsFirst: false`); ties fall back to newest-added first, matching the
+ * server's secondary `created_at` ordering.
+ */
+export function compareReleases(a: Release, b: Release, sort: SortKey): number {
+  switch (sort) {
+    case 'name-asc':
+      return a.projectName.localeCompare(b.projectName)
+    case 'name-desc':
+      return b.projectName.localeCompare(a.projectName)
+    case 'added-desc':
+      return b.createdAt.localeCompare(a.createdAt)
+    case 'date-asc':
+    case 'date-desc': {
+      if (a.releaseDate !== b.releaseDate) {
+        if (!a.releaseDate) return 1
+        if (!b.releaseDate) return -1
+        const cmp = a.releaseDate.localeCompare(b.releaseDate)
+        return sort === 'date-asc' ? cmp : -cmp
+      }
+      return b.createdAt.localeCompare(a.createdAt)
+    }
+    default:
+      return 0
+  }
+}
+
+/**
+ * Whether a release satisfies the active filter set (type, artists, platforms).
+ * Facets are independent (AND across facets). The artist facet is also AND: a
+ * release must be credited to *every* selected artist. The platform facet is OR:
+ * a release matches if it's available on any selected platform. An empty facet
+ * imposes no constraint. Search is handled separately in the page.
+ */
+export function matchesFilters(release: Release, filters: ReleaseFilters): boolean {
+  if (filters.type !== 'all' && release.projectType !== filters.type) return false
+
+  if (filters.artistIds.length > 0) {
+    const creditedIds = new Set(release.artists.map((artist) => artist.id))
+    const hasAll = filters.artistIds.every((id) => creditedIds.has(id))
+    if (!hasAll) return false
+  }
+
+  if (filters.platforms.length > 0) {
+    const available = filters.platforms.some((platform) =>
+      Boolean(release.platformLinks[platform]?.trim())
+    )
+    if (!available) return false
+  }
+
+  return true
 }
 
 /** Format an ISO date (`YYYY-MM-DD`) for display; empty string when absent. */

@@ -4,6 +4,7 @@ import { TitleBar } from '../components/TitleBar'
 import { Sidebar } from '../components/Sidebar'
 import { AuthGate } from '../components/AuthGate'
 import { TransitionProvider } from '../components/PageTransition'
+import { UserBar } from '../components/UserBar'
 import { useAppBootstrap } from './useAppBootstrap'
 import { useThemeSync } from './useThemeSync'
 import { useUpdaterSync } from './useUpdaterSync'
@@ -33,6 +34,7 @@ export function AppRoot(): React.JSX.Element {
                 <AppRouter />
               </div>
             </div>
+            <UserBar />
           </AuthGate>
         </div>
       </TransitionProvider>

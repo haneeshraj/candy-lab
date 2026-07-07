@@ -5,7 +5,9 @@
 
   @include flex-center;
 
-  min-height: calc(100vh - #{$titlebar-height});
+  // Match the page's content-box height (viewport minus title bar and the
+  // UserBar clearance) so the centered content fills without overflowing.
+  min-height: calc(100vh - #{$titlebar-height} - #{$userbar-clearance});
   overflow: hidden; // contain the blurred glow
 }
 

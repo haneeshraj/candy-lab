@@ -1,6 +1,6 @@
 import type { Variants } from 'motion/react'
 import type { MotionPreset } from '../utils/types'
-import { slideDown, slideUpSm } from '../variants/slide'
+import { slideDown, slideUp, slideUpSm } from '../variants/slide'
 import { scaleYTop } from '../variants/scale'
 import { fastTransition } from '../transitions/fast'
 import { emphasizedTransition } from '../transitions/emphasized'
@@ -63,4 +63,36 @@ export const menuItem: MotionPreset = {
   animate: 'visible',
   exit: 'exit',
   transition: emphasizedTransition
+}
+
+// A panel that rises from a bar anchored to the bottom (e.g. the floating user
+// bar). It slides UP + fades while its items cascade in just after. Pair with
+// `transform-origin: bottom`. Same shape as `menuPanel`, but a slide instead of
+// a scale, with a quicker cascade — reuse `menuItem` for the items.
+
+/** Seconds between each item, and before the first item starts. */
+const userItemStagger = 0.05
+const userItemsDelay = 0.05
+
+const userMenuPanelVariants: Variants = {
+  ...slideUp,
+  visible: {
+    ...slideUp.visible,
+    transition: { staggerChildren: userItemStagger, delayChildren: userItemsDelay }
+  },
+  exit: {
+    ...slideUp.exit,
+    // Items fade out first (see `menuItemVariants`); the panel then slides away
+    // after a beat. `delay` targets the panel's own slide/opacity.
+    transition: { delay: userItemsDelay, staggerChildren: userItemStagger, staggerDirection: -1 }
+  }
+}
+
+/** The user-bar menu panel — slides up from the bar and orchestrates its items. */
+export const userMenuPanel: MotionPreset = {
+  variants: userMenuPanelVariants,
+  initial: 'hidden',
+  animate: 'visible',
+  exit: 'exit',
+  transition: fastTransition // drives the panel's own slide/opacity timing
 }

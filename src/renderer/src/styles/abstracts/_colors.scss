@@ -92,3 +92,7 @@ $info: var(--color-info);
 // Interaction helpers
 $focus-ring: var(--color-focus-ring);
 $overlay: var(--color-overlay);
+
+// Fill for text/icons sitting ON a saturated accent (avatar gradients, colored
+// chips). Static white — reads in both themes.
+$on-accent: $light-900;

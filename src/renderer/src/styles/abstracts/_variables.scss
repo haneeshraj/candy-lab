@@ -121,6 +121,11 @@ $layout-max-width: 1280px;
 $layout-content-width: 960px;
 $layout-narrow-width: 640px;
 $titlebar-height: rem(40px);
+
+// Bottom clearance reserved for the floating UserBar (pinned bottom-left), so
+// full-height pages fill the viewport without scrolling and scrollable content
+// is never hidden behind the bar.
+$userbar-clearance: space(20);
 $control-height: rem(38px);
 $control-height-sm: rem(30px);
 $control-width-sm: rem(30px);

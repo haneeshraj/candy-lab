@@ -3,11 +3,17 @@
 // Shared frame for every routed page: a fixed gap from the sidebar rail and at
 // least the full remaining viewport height (window minus the title bar).
 .page {
+  // Fill the full height below the title bar so the surface always reaches the
+  // window bottom. `box-sizing: border-box` keeps `padding-bottom` INSIDE this
+  // height — reserving UserBar clearance for content without shrinking the
+  // surface — so short pages show no gap and don't scroll, while tall pages
+  // grow and the padding keeps their last row above the bar.
   min-height: calc(100vh - #{$titlebar-height});
 
   // `margin` (not padding) so the gap sits OUTSIDE the panel's background —
   // an empty 30px strip between the sidebar and the surface, not a colored inset.
   margin-left: rem(16px);
+  padding-bottom: $userbar-clearance;
   background-color: $surface;
   border-radius: $radius-lg 0 0 0; // round the top corners, but not the bottom
 }

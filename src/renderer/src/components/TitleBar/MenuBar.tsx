@@ -4,7 +4,7 @@ import { AnimatePresence, motion } from 'motion/react'
 
 import { menuItem, menuPanel, motionSafePreset, useReducedMotionSafe } from '@renderer/animations'
 import { useOnClickOutside } from '@renderer/hooks'
-import { selectAuthPhase, useAuthStore, useElectronStore, useUIStore } from '@renderer/store'
+import { useElectronStore, useUIStore } from '@renderer/store'
 import { ROUTE_PATHS } from '../../router/routePaths'
 import { Logo } from '../../assets/Logo'
 import { AppInfoContent } from '../AppInfo'
@@ -45,7 +45,6 @@ export function MenuBar(): React.JSX.Element {
   const ref = useRef<HTMLDivElement>(null)
   const navigate = useNavigate()
 
-  const authPhase = useAuthStore(selectAuthPhase)
   const updateStatus = useElectronStore((state) => state.updateStatus)
 
   const openModals = useUIStore((state) => state.openModals)
@@ -82,19 +81,6 @@ export function MenuBar(): React.JSX.Element {
           onSelect: () => window.api.updater.install()
         },
         { label: 'Release Notes', onSelect: () => openModal(MODAL_RELEASE_NOTES) }
-      ]
-    },
-    {
-      id: 'user',
-      label: 'User',
-      show: authPhase !== 'signed-out',
-      items: [
-        {
-          label: 'Sign out',
-          onSelect: () => {
-            void window.api.auth.signOut()
-          }
-        }
       ]
     },
     {

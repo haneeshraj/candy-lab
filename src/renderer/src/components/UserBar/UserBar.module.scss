@@ -1,0 +1,135 @@
+@use 'abstracts' as *;
+
+// Floating bar pinned bottom-left, just to the right of the 60px sidebar rail.
+// `position: fixed` so it hovers over the page surface (Discord-style) rather
+// than taking layout space in the rail.
+.wrap {
+  position: fixed;
+  bottom: space(3);
+  left: calc(#{rem(60px)} + #{space(8)}); // clear the rail, then a small gap
+  z-index: z(dropdown);
+  width: rem(224px);
+}
+
+// The whole bar is the trigger — clicking anywhere on it toggles the menu.
+// Frosted glass: a translucent fill + backdrop blur over the page behind it.
+.bar {
+  display: flex;
+  align-items: center;
+  gap: space(2);
+  width: 100%;
+  padding: space(2);
+  text-align: left;
+  cursor: pointer;
+  background-color: with-alpha($surface-light, 0.6);
+  border: 1px solid with-alpha($border, 0.6);
+  border-radius: $radius-md;
+  box-shadow: $shadow-md;
+  backdrop-filter: blur(rem(16px));
+  transition: $transition-colors;
+
+  @include hover {
+    background-color: with-alpha($surface-light, 0.78);
+    border-color: $border;
+  }
+}
+
+.avatar {
+  @include flex-center;
+  @include size(rem(36px));
+
+  flex-shrink: 0;
+  font-size: $font-size-xs;
+  font-weight: 700;
+  color: $on-accent; // reads on the saturated gradient in both themes
+  background-size: cover;
+  border-radius: $radius-circle;
+  user-select: none;
+}
+
+.identity {
+  display: flex;
+  flex-direction: column;
+  min-width: 0; // let the name truncate instead of pushing the gear out
+  line-height: 1.2;
+}
+
+.name {
+  @include truncate;
+
+  font-size: $font-size-sm;
+  font-weight: 600;
+  color: $text-primary;
+}
+
+.role {
+  font-size: $font-size-xxs;
+  color: $text-secondary;
+}
+
+// Decorative affordance (the bar itself is the button). Rotates in when open.
+.gear {
+  @include flex-center;
+  @include size($control-height-sm);
+
+  flex-shrink: 0;
+  margin-left: auto;
+  color: $text-secondary;
+  transition:
+    transform $duration-normal $ease-standard,
+    color $duration-fast $ease-standard;
+}
+
+.gearOpen {
+  color: $text-primary;
+  transform: rotate(90deg);
+}
+
+// The menu — absolutely positioned ABOVE the bar so it rises out of it.
+// `transform-origin: bottom` pairs with the slide-up preset.
+.panel {
+  position: absolute;
+  bottom: calc(100% + #{space(2)});
+  left: 0;
+  right: 0;
+  display: flex;
+  flex-direction: column;
+  gap: space(1);
+  padding: space(1);
+  background-color: with-alpha($surface-light, 0.72);
+  border: 1px solid with-alpha($border, 0.6);
+  border-radius: $radius-md;
+  box-shadow: $shadow-lg;
+  backdrop-filter: blur(rem(16px));
+  transform-origin: bottom;
+}
+
+.action {
+  display: flex;
+  align-items: center;
+  gap: space(2);
+  width: 100%;
+  padding: space(2);
+  font-size: $font-size-sm;
+  color: $text-secondary;
+  border-radius: $radius-sm;
+  transition: $transition-colors;
+
+  @include hover {
+    color: $text-primary;
+    background-color: $surface;
+  }
+
+  svg {
+    flex-shrink: 0;
+  }
+}
+
+.danger {
+  color: $error;
+
+  @include hover {
+    color: $error;
+    background-color: with-alpha($error, 0.12);
+  }
+}

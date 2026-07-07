@@ -43,3 +43,49 @@
   gap: space(3);
   padding-top: space(2);
 }
+
+.tracksField {
+  display: flex;
+  flex-direction: column;
+  gap: space(2);
+}
+
+.addTrackButton {
+  align-self: flex-start;
+  padding: space(1) space(2);
+  font-size: $font-size-xs;
+  font-weight: $font-weight-medium;
+  color: $primary;
+  cursor: pointer;
+  background: none;
+  border: $border-width dashed $border;
+  border-radius: $radius-md;
+  transition: $transition-colors;
+
+  @include hover {
+    background-color: with-alpha($primary, 0.1);
+    border-color: $primary;
+  }
+}
+
+.trackCreate {
+  display: flex;
+  flex-direction: column;
+  gap: space(4);
+  padding: space(4);
+  background-color: with-alpha($primary, 0.05);
+  border: $border-width solid $border;
+  border-radius: $radius-md;
+}
+
+.trackCreateHint {
+  margin: 0;
+  font-size: $font-size-xs;
+  color: $text-secondary;
+}
+
+.trackCreateActions {
+  display: flex;
+  justify-content: flex-end;
+  gap: space(2);
+}

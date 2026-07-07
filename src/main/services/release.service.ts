@@ -28,6 +28,7 @@ interface ReleaseRow {
   cover_art_url: string | null
   canvas_url: string | null
   preview_enabled: boolean
+  is_album_track: boolean
   created_at: string
   release_artists?: { artists: Artist | null }[] | null
   // Child track links where this release is the album (see `release_tracks`).
@@ -67,6 +68,7 @@ function mapRelease(row: ReleaseRow): Release {
     coverArtUrl: row.cover_art_url,
     canvasUrl: row.canvas_url,
     previewEnabled: row.preview_enabled,
+    isAlbumTrack: row.is_album_track ?? false,
     createdAt: row.created_at,
     artists: (row.release_artists ?? [])
       .map((link) => link.artists)
@@ -81,6 +83,29 @@ function mapRelease(row: ReleaseRow): Release {
 /** Album/EP releases own tracks; every other type never does. */
 function ownsTracks(type: Release['projectType']): boolean {
   return type === 'album' || type === 'ep'
+}
+
+/**
+ * Of the given track ids, which are album-only tracks (created inside an album,
+ * hidden from the catalog). These belong to exactly one album, so when an album
+ * is deleted — or one of these tracks is unlinked from it — the track is orphaned
+ * and should be deleted along with it.
+ */
+async function albumOnlyChildIds(
+  supabase: ReturnType<typeof getSupabase>,
+  trackIds: string[]
+): Promise<string[]> {
+  if (trackIds.length === 0) return []
+  const { data, error } = await supabase
+    .from('releases')
+    .select('id')
+    .in('id', trackIds)
+    .eq('is_album_track', true)
+  if (error) {
+    logger.error('albumOnlyChildIds lookup failed', error)
+    throw new Error(error.message)
+  }
+  return (data as { id: string }[]).map((row) => row.id)
 }
 
 /**
@@ -131,6 +156,8 @@ export async function listReleases(offset = 0, limit = DEFAULT_PAGE_SIZE): Promi
   const { data, error, count } = await getSupabase()
     .from('releases')
     .select(RELEASE_SELECT, { count: 'exact' })
+    // Album-only tracks live inside their album, never in the standalone catalog.
+    .eq('is_album_track', false)
     .order('release_date', { ascending: false, nullsFirst: false })
     .order('created_at', { ascending: false })
     .range(offset, offset + limit - 1)
@@ -182,7 +209,8 @@ export async function createRelease(input: ReleaseInput): Promise<Release> {
       master_link: input.masterLink,
       cover_art_url: input.coverArtUrl,
       canvas_url: input.canvasUrl,
-      preview_enabled: input.previewEnabled
+      preview_enabled: input.previewEnabled,
+      is_album_track: input.isAlbumTrack ?? false
     })
     .select('id')
     .single()
@@ -249,7 +277,8 @@ export async function updateRelease(id: string, input: ReleaseInput): Promise<Re
       master_link: input.masterLink,
       cover_art_url: input.coverArtUrl,
       canvas_url: input.canvasUrl,
-      preview_enabled: input.previewEnabled
+      preview_enabled: input.previewEnabled,
+      is_album_track: input.isAlbumTrack ?? current.isAlbumTrack
     })
     .eq('id', id)
 
@@ -278,15 +307,41 @@ export async function updateRelease(id: string, input: ReleaseInput): Promise<Re
 
   await syncTrackLinks(supabase, id, input)
 
+  // Any album-only track dropped from the tracklist (or orphaned by switching the
+  // release away from Album/EP) belongs to nothing now — delete it and its media.
+  const newTrackIds = ownsTracks(input.projectType) ? input.trackIds : []
+  const removedIds = current.trackIds.filter((trackId) => !newTrackIds.includes(trackId))
+  for (const orphanId of await albumOnlyChildIds(supabase, removedIds)) {
+    await deleteRelease(orphanId)
+  }
+
   await removeAssets(staleAssets)
   return getReleaseById(id)
+}
+
+/**
+ * Fill an album-only track's missing cover/canvas from its owning album, by
+ * reference (resolved on every read): album-only tracks that were created without
+ * their own artwork display the album's media, so a change to the album cover
+ * flows through automatically. Standalone tracks (real singles linked into the
+ * album) are returned untouched — they keep whatever media they already have.
+ */
+function inheritAlbumMedia(track: Release, album: Release): Release {
+  if (!track.isAlbumTrack) return track
+  if (track.coverArtUrl && track.canvasUrl) return track
+  return {
+    ...track,
+    coverArtUrl: track.coverArtUrl ?? album.coverArtUrl,
+    canvasUrl: track.canvasUrl ?? album.canvasUrl
+  }
 }
 
 /**
  * The child track releases of an Album or EP, in tracklist order, each with its
  * own artist credits — the album/EP detail view's right-hand list. Resolved in
  * two round-trips (link ids, then the releases), reordered to match `position`
- * since `.in()` doesn't preserve order.
+ * since `.in()` doesn't preserve order. Album-only tracks with no artwork of
+ * their own inherit the album's cover/canvas (see `inheritAlbumMedia`).
  */
 export async function listReleaseTracks(albumId: string): Promise<Release[]> {
   const supabase = getSupabase()
@@ -305,6 +360,9 @@ export async function listReleaseTracks(albumId: string): Promise<Release[]> {
   const orderedIds = (links as { track_id: string }[]).map((link) => link.track_id)
   if (orderedIds.length === 0) return []
 
+  // The album, so album-only tracks can inherit its media (one extra round-trip).
+  const album = await getReleaseById(albumId)
+
   const { data, error } = await supabase
     .from('releases')
     .select(RELEASE_SELECT)
@@ -319,12 +377,21 @@ export async function listReleaseTracks(albumId: string): Promise<Release[]> {
   return orderedIds
     .map((trackId) => byId.get(trackId))
     .filter((release): release is Release => release !== undefined)
+    .map((track) => inheritAlbumMedia(track, album))
 }
 
-/** Delete a release (relations cascade) and remove its media from storage. */
+/** Delete a release (relations cascade) and remove its media from storage. When
+ * deleting an Album/EP, its album-only tracks are deleted too — they exist only
+ * inside this album, so they'd otherwise be orphaned. */
 export async function deleteRelease(id: string): Promise<void> {
   const supabase = getSupabase()
   const current = await getReleaseById(id)
+
+  // Resolve album-only children before the delete (the junction rows cascade away
+  // with the album, so we'd lose the link to find them afterwards).
+  const orphanChildIds = ownsTracks(current.projectType)
+    ? await albumOnlyChildIds(supabase, current.trackIds)
+    : []
 
   const { error } = await supabase.from('releases').delete().eq('id', id)
   if (error) {
@@ -335,6 +402,12 @@ export async function deleteRelease(id: string): Promise<void> {
   await removeAssets(
     [current.coverArtUrl, current.canvasUrl].filter((url): url is string => Boolean(url))
   )
+
+  // Children are standalone-typed (never own tracks), so this recursion is one
+  // level deep and terminates. Each removes its own (real) media, if any.
+  for (const childId of orphanChildIds) {
+    await deleteRelease(childId)
+  }
 }
 
 /** Derive a bucket object path from a public storage URL (or null if it isn't

@@ -121,6 +121,13 @@ export interface Release {
   coverArtUrl: string | null
   canvasUrl: string | null
   previewEnabled: boolean
+  /**
+   * True for an "album-only" track: a release that exists only inside an
+   * Album/EP (created inline from the album form) and is hidden from the main
+   * catalog. When resolved through `releases.tracks(albumId)`, a null
+   * `coverArtUrl` / `canvasUrl` is filled in from the owning album's media.
+   */
+  isAlbumTrack: boolean
   /** ISO timestamp. */
   createdAt: string
   artists: Artist[]
@@ -145,6 +152,11 @@ export interface ReleaseInput {
   coverArtUrl: string | null
   canvasUrl: string | null
   previewEnabled: boolean
+  /**
+   * Mark this release as an album-only track (hidden from the catalog). Defaults
+   * to false — set true only when creating a track inline from an album's form.
+   */
+  isAlbumTrack?: boolean
   artistIds: string[]
   /**
    * Ordered IDs of the child track releases for an Album or EP. Each must be an

@@ -1,10 +1,11 @@
-import { useEffect, useRef, useState } from 'react'
+import { useEffect, useMemo, useRef, useState } from 'react'
 import { Modal } from '@renderer/components/Modal'
 import { Button, Checkbox, FileField, Select, TagInput, TextField } from '@renderer/components/ui'
 import { useArtists } from '../hooks/useArtists'
+import { useReleaseTracks } from '../hooks/useReleaseTracks'
 import { useTrackOptions } from '../hooks/useTrackOptions'
 import { isMultiTrack, PLATFORMS, PROJECT_TYPES } from '../constants'
-import type { ProjectType, Release, ReleaseInput } from '../types'
+import type { Artist, ProjectType, Release, ReleaseInput } from '../types'
 import { errorMessage } from '../utils'
 import { ArtistSelect } from './ArtistSelect'
 import { TrackSelect } from './TrackSelect'
@@ -63,6 +64,146 @@ async function uploadFile(file: File): Promise<string> {
 }
 
 /**
+ * Inline creator for an "album-only" track — a release that exists only inside
+ * this album (hidden from the catalog). It has no artwork of its own: cover art
+ * and canvas are inherited from the album at display time. Rendered inside the
+ * parent release form's `<form>`, so it uses plain buttons (never `type=submit`)
+ * and swallows Enter to avoid submitting the album while you're filling it in.
+ * Full details (including its own artwork) can be edited later from its track row.
+ */
+function TrackCreateForm({
+  artists,
+  onCreateArtist,
+  onCreated,
+  onCancel
+}: {
+  artists: Artist[]
+  onCreateArtist: (name: string) => Promise<Artist>
+  onCreated: (track: Release) => void
+  onCancel: () => void
+}): React.JSX.Element {
+  const [projectName, setProjectName] = useState('')
+  const [artistIds, setArtistIds] = useState<string[]>([])
+  const [releaseDate, setReleaseDate] = useState('')
+  const [genres, setGenres] = useState<string[]>([])
+  const [platformLinks, setPlatformLinks] = useState<Record<string, string>>({})
+  const [masterLink, setMasterLink] = useState('')
+  const [nameError, setNameError] = useState<string | undefined>()
+  const [submitError, setSubmitError] = useState<string | null>(null)
+  const [submitting, setSubmitting] = useState(false)
+
+  const submit = async (): Promise<void> => {
+    const name = projectName.trim()
+    if (!name) {
+      setNameError('Track name is required.')
+      return
+    }
+    setNameError(undefined)
+    setSubmitError(null)
+    setSubmitting(true)
+    try {
+      const created = await window.api.releases.create({
+        projectName: name,
+        projectType: 'single',
+        releaseDate: releaseDate || null,
+        genres,
+        platformLinks,
+        visualLink: null,
+        masterLink: masterLink.trim() || null,
+        coverArtUrl: null,
+        canvasUrl: null,
+        previewEnabled: false,
+        isAlbumTrack: true,
+        artistIds,
+        trackIds: []
+      })
+      onCreated(created)
+    } catch (err) {
+      setSubmitError(errorMessage(err, 'Failed to create track.'))
+    } finally {
+      setSubmitting(false)
+    }
+  }
+
+  // Keep Enter from submitting the parent album form. The sub-fields that use
+  // Enter (artists, genres) call preventDefault themselves, so we only swallow it
+  // for the plain inputs (name, master link, date) that would otherwise submit.
+  const guardEnter = (event: React.KeyboardEvent): void => {
+    const target = event.target as HTMLElement
+    if (event.key === 'Enter' && !event.defaultPrevented && target.tagName === 'INPUT') {
+      event.preventDefault()
+    }
+  }
+
+  return (
+    <div className={styles.trackCreate} onKeyDown={guardEnter}>
+      <p className={styles.trackCreateHint}>
+        New album-only track — hidden from the catalog. Its cover art and canvas are inherited from
+        the album. You can fill in the rest (or give it its own artwork) later from its track row.
+      </p>
+
+      <TextField
+        label="Track name"
+        placeholder="e.g. Interlude"
+        value={projectName}
+        error={nameError}
+        onChange={(event) => setProjectName(event.target.value)}
+        autoFocus
+      />
+
+      <ArtistSelect
+        label="Artists"
+        artists={artists}
+        selectedIds={artistIds}
+        onChange={setArtistIds}
+        onCreate={onCreateArtist}
+      />
+
+      <TagInput
+        label="Genres"
+        value={genres}
+        onChange={setGenres}
+        placeholder="Type a genre and press Enter"
+      />
+
+      <PlatformLinksField
+        label="Platforms & track links"
+        platforms={PLATFORMS}
+        value={platformLinks}
+        onChange={setPlatformLinks}
+      />
+
+      <div className={styles.grid}>
+        <TextField
+          label="Release date"
+          type="date"
+          value={releaseDate}
+          onChange={(event) => setReleaseDate(event.target.value)}
+        />
+        <TextField
+          label="Final master link"
+          type="url"
+          placeholder="https://…"
+          value={masterLink}
+          onChange={(event) => setMasterLink(event.target.value)}
+        />
+      </div>
+
+      {submitError && <p className={styles.error}>{submitError}</p>}
+
+      <div className={styles.trackCreateActions}>
+        <Button variant="ghost" size="sm" onClick={onCancel} disabled={submitting}>
+          Cancel
+        </Button>
+        <Button size="sm" onClick={() => void submit()} disabled={submitting}>
+          {submitting ? 'Adding…' : 'Add track'}
+        </Button>
+      </div>
+    </div>
+  )
+}
+
+/**
  * The form body. Mounted fresh each time the modal opens (Modal only renders its
  * children while open), so `useState` initializers seed it from `release` with
  * no prefill effect.
@@ -88,6 +229,27 @@ function ReleaseForm({
     showTracks,
     release?.id
   )
+
+  // When editing an existing Album/EP, load its current tracklist so already-linked
+  // tracks render as chips even though album-only ones are hidden from the pool
+  // (the pool comes from the catalog list, which excludes them). Without this they
+  // couldn't be resolved by id and would silently drop on save.
+  const { tracks: linkedTracks } = useReleaseTracks(release)
+
+  // Album-only tracks created inline this session, so their chips resolve before
+  // a save/reload round-trips them back through the pool.
+  const [createdTracks, setCreatedTracks] = useState<Release[]>([])
+  const [showTrackCreate, setShowTrackCreate] = useState(false)
+
+  // Everything the picker can resolve by id: the catalog pool, this album's
+  // existing tracks, and any created this session. De-duped, pool order first.
+  const trackPool = useMemo(() => {
+    const byId = new Map<string, Release>()
+    for (const track of [...trackOptions, ...linkedTracks, ...createdTracks]) {
+      byId.set(track.id, track)
+    }
+    return [...byId.values()]
+  }, [trackOptions, linkedTracks, createdTracks])
 
   // Media: a newly-picked File replaces the existing URL on save. Track both so
   // "keep current", "replace", and "remove" are all expressible.
@@ -119,6 +281,14 @@ function ReleaseForm({
 
   const patch = <K extends keyof typeof form>(key: K, value: (typeof form)[K]): void =>
     setForm((prev) => ({ ...prev, [key]: value }))
+
+  // An inline-created album-only track: remember it so its chip resolves, and
+  // append it to the tracklist in order.
+  const handleTrackCreated = (track: Release): void => {
+    setCreatedTracks((prev) => [...prev, track])
+    setForm((prev) => ({ ...prev, trackIds: [...prev.trackIds, track.id] }))
+    setShowTrackCreate(false)
+  }
 
   const pickCover = async (file: File | null): Promise<void> => {
     if (objectUrlRef.current) {
@@ -252,13 +422,31 @@ function ReleaseForm({
       />
 
       {showTracks && (
-        <TrackSelect
-          label="Tracks"
-          options={trackOptions}
-          selectedIds={form.trackIds}
-          onChange={(ids) => patch('trackIds', ids)}
-          loading={trackOptionsLoading}
-        />
+        <div className={styles.tracksField}>
+          <TrackSelect
+            label="Tracks"
+            options={trackPool}
+            selectedIds={form.trackIds}
+            onChange={(ids) => patch('trackIds', ids)}
+            loading={trackOptionsLoading}
+          />
+          {showTrackCreate ? (
+            <TrackCreateForm
+              artists={artists}
+              onCreateArtist={addArtist}
+              onCreated={handleTrackCreated}
+              onCancel={() => setShowTrackCreate(false)}
+            />
+          ) : (
+            <button
+              type="button"
+              className={styles.addTrackButton}
+              onClick={() => setShowTrackCreate(true)}
+            >
+              + New album-only track
+            </button>
+          )}
+        </div>
       )}
 
       <TagInput

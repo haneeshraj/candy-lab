@@ -23,6 +23,9 @@ export interface Release {
   coverArtUrl: string | null
   canvasUrl: string | null
   previewEnabled: boolean
+  /** True for an album-only track (hidden from the catalog). When resolved via
+   * `releases.tracks`, a null cover/canvas is filled from the owning album. */
+  isAlbumTrack: boolean
   createdAt: string
   artists: Artist[]
   /** Ordered IDs of the child track releases (Album/EP only; empty otherwise). */
@@ -46,6 +49,8 @@ export interface ReleaseInput {
   coverArtUrl: string | null
   canvasUrl: string | null
   previewEnabled: boolean
+  /** Mark as an album-only track (hidden from the catalog). Defaults to false. */
+  isAlbumTrack?: boolean
   artistIds: string[]
   /** Ordered IDs of the child track releases for an Album/EP (empty otherwise). */
   trackIds: string[]

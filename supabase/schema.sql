@@ -31,6 +31,11 @@ create table if not exists public.releases (
   cover_art_url   text,
   canvas_url      text,
   preview_enabled boolean not null default false,
+  -- True for "album-only" tracks: releases that exist only inside an Album/EP
+  -- (created inline from the album form), hidden from the main catalog. When
+  -- their cover_art_url / canvas_url is null, the app resolves the owning album's
+  -- media at read time. Default false = a normal, standalone release.
+  is_album_track  boolean not null default false,
   created_at      timestamptz not null default now()
 );
 
@@ -62,6 +67,7 @@ create table if not exists public.release_tracks (
 -- Helpful indexes for search / filtering as the catalog grows.
 create index if not exists releases_created_at_idx on public.releases (created_at desc);
 create index if not exists releases_project_type_idx on public.releases (project_type);
+create index if not exists releases_is_album_track_idx on public.releases (is_album_track);
 create index if not exists release_artists_artist_idx on public.release_artists (artist_id);
 create index if not exists release_tracks_album_idx on public.release_tracks (album_id, position);
 create index if not exists release_tracks_track_idx on public.release_tracks (track_id);

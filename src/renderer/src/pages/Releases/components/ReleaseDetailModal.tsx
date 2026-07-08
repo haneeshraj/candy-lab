@@ -10,9 +10,10 @@ import {
 } from '@renderer/animations'
 import { IconCheck, IconClose, IconEdit, IconLink, IconTrash } from '../../../assets/icons'
 import { isMultiTrack, PROJECT_TYPE_LABELS } from '../constants'
+import { useCountdown, type Countdown } from '../hooks/useCountdown'
 import { useReleaseTracks } from '../hooks/useReleaseTracks'
 import type { Release } from '../types'
-import { buildReleaseUrl, formatReleaseDate } from '../utils'
+import { buildReleaseUrl, formatReleaseDate, releaseInstant } from '../utils'
 import styles from './ReleaseDetailModal.module.scss'
 
 interface ReleaseDetailModalProps {
@@ -60,6 +61,51 @@ async function copyText(text: string): Promise<boolean> {
 }
 
 /**
+ * The pre-release state of the stage: a live countdown to the release instant
+ * plus the pre-save link, shown in place of the streaming platform links. The
+ * parent only renders this while `now` is before the release date, so it never
+ * needs to know the date has passed — it simply disappears when the parent
+ * re-evaluates (the countdown flips `isComplete`).
+ */
+function PreReleaseCountdown({
+  countdown,
+  preSaveLink
+}: {
+  countdown: Countdown
+  preSaveLink: string | null
+}): React.JSX.Element {
+  const units: { label: string; value: number }[] = [
+    { label: 'Days', value: countdown.days },
+    { label: 'Hrs', value: countdown.hours },
+    { label: 'Min', value: countdown.minutes },
+    { label: 'Sec', value: countdown.seconds }
+  ]
+
+  return (
+    <div className={styles.preSave}>
+      <div className={styles.countdown} role="timer" aria-label="Time until release">
+        {units.map((unit) => (
+          <div key={unit.label} className={styles.countUnit}>
+            <span className={styles.countValue}>{String(unit.value).padStart(2, '0')}</span>
+            <span className={styles.countLabel}>{unit.label}</span>
+          </div>
+        ))}
+      </div>
+
+      {preSaveLink && (
+        <button
+          type="button"
+          className={styles.preSaveButton}
+          onClick={() => openExternal(preSaveLink)}
+        >
+          Pre-save
+        </button>
+      )}
+    </div>
+  )
+}
+
+/**
  * The visual "stage": the Spotify canvas video (or blurred cover art) with the
  * cover + track details pinned to the bottom. It fills its container, so it's
  * the whole dialog for a standalone release and the left column for an Album/EP.
@@ -67,6 +113,13 @@ async function copyText(text: string): Promise<boolean> {
 function ReleaseStage({ release }: { release: Release }): React.JSX.Element {
   const artistNames = release.artists.map((artist) => artist.name).join(', ')
   const date = formatReleaseDate(release.releaseDate)
+
+  // Pre-release: while the release date is still in the future, show a live
+  // countdown + pre-save link and hide every streaming platform link (even ones
+  // already added). The countdown flips `isComplete` the moment the date arrives,
+  // switching this view over to the platform links with no data change or edit.
+  const countdown = useCountdown(releaseInstant(release))
+  const preRelease = !countdown.isComplete
 
   return (
     <div className={styles.stage}>
@@ -109,19 +162,23 @@ function ReleaseStage({ release }: { release: Release }): React.JSX.Element {
             </div>
           )}
 
-          {Object.keys(release.platformLinks).length > 0 && (
-            <div className={styles.links}>
-              {Object.entries(release.platformLinks).map(([platform, url]) => (
-                <button
-                  key={platform}
-                  type="button"
-                  className={styles.link}
-                  onClick={() => openExternal(url)}
-                >
-                  {platform}
-                </button>
-              ))}
-            </div>
+          {preRelease ? (
+            <PreReleaseCountdown countdown={countdown} preSaveLink={release.preSaveLink} />
+          ) : (
+            Object.keys(release.platformLinks).length > 0 && (
+              <div className={styles.links}>
+                {Object.entries(release.platformLinks).map(([platform, url]) => (
+                  <button
+                    key={platform}
+                    type="button"
+                    className={styles.link}
+                    onClick={() => openExternal(url)}
+                  >
+                    {platform}
+                  </button>
+                ))}
+              </div>
+            )
           )}
 
           {(release.visualLink || release.masterLink) && (

@@ -25,6 +25,7 @@ interface ReleaseRow {
   platform_links: Record<string, string> | null
   visual_link: string | null
   master_link: string | null
+  pre_save_link: string | null
   cover_art_url: string | null
   canvas_url: string | null
   preview_enabled: boolean
@@ -65,6 +66,7 @@ function mapRelease(row: ReleaseRow): Release {
     platformLinks: row.platform_links ?? {},
     visualLink: row.visual_link,
     masterLink: row.master_link,
+    preSaveLink: row.pre_save_link ?? null,
     coverArtUrl: row.cover_art_url,
     canvasUrl: row.canvas_url,
     previewEnabled: row.preview_enabled,
@@ -207,6 +209,7 @@ export async function createRelease(input: ReleaseInput): Promise<Release> {
       platform_links: cleanPlatformLinks(input.platformLinks),
       visual_link: input.visualLink,
       master_link: input.masterLink,
+      pre_save_link: input.preSaveLink,
       cover_art_url: input.coverArtUrl,
       canvas_url: input.canvasUrl,
       preview_enabled: input.previewEnabled,
@@ -275,6 +278,7 @@ export async function updateRelease(id: string, input: ReleaseInput): Promise<Re
       platform_links: cleanPlatformLinks(input.platformLinks),
       visual_link: input.visualLink,
       master_link: input.masterLink,
+      pre_save_link: input.preSaveLink,
       cover_art_url: input.coverArtUrl,
       canvas_url: input.canvasUrl,
       preview_enabled: input.previewEnabled,

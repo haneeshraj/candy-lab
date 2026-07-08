@@ -86,15 +86,47 @@ export function matchesFilters(release: Release, filters: ReleaseFilters): boole
   return true
 }
 
-/** Format an ISO date (`YYYY-MM-DD`) for display; empty string when absent. */
-export function formatReleaseDate(date: string | null): string {
-  if (!date) return ''
-  // Parse Y-M-D as a LOCAL date. `new Date('2026-07-03')` parses as UTC
-  // midnight, which renders as the previous day in negative-offset timezones.
+/**
+ * Parse an ISO date (`YYYY-MM-DD`) as a LOCAL date at midnight. `new Date('2026-07-03')`
+ * parses as UTC midnight, which lands on the previous day in negative-offset
+ * timezones — so we build the date from its parts instead. Returns null when the
+ * value can't be parsed.
+ */
+function parseLocalDate(date: string): Date | null {
   const match = /^(\d{4})-(\d{2})-(\d{2})/.exec(date)
   const parsed = match
     ? new Date(Number(match[1]), Number(match[2]) - 1, Number(match[3]))
     : new Date(date)
-  if (Number.isNaN(parsed.getTime())) return date
-  return parsed.toLocaleDateString(undefined, { year: 'numeric', month: 'short', day: 'numeric' })
+  return Number.isNaN(parsed.getTime()) ? null : parsed
+}
+
+/** Format an ISO date (`YYYY-MM-DD`) for display; empty string when absent. */
+export function formatReleaseDate(date: string | null): string {
+  if (!date) return ''
+  const parsed = parseLocalDate(date)
+  return parsed
+    ? parsed.toLocaleDateString(undefined, { year: 'numeric', month: 'short', day: 'numeric' })
+    : date
+}
+
+/**
+ * The instant a release goes live — local midnight at the start of its release
+ * date, as epoch milliseconds. Null when the release has no date (nothing to
+ * count down to). This is the single reference point the pre/post-release state
+ * is derived from.
+ */
+export function releaseInstant(release: Pick<Release, 'releaseDate'>): number | null {
+  if (!release.releaseDate) return null
+  return parseLocalDate(release.releaseDate)?.getTime() ?? null
+}
+
+/**
+ * Whether a release is still in its pre-release (pre-save) window: it has a
+ * release date and the current time is before it. Derived from `releaseDate`
+ * alone, so the app and the public website agree from the clock — no stored flag.
+ * `now` is injectable for testing.
+ */
+export function isPreRelease(release: Pick<Release, 'releaseDate'>, now = Date.now()): boolean {
+  const instant = releaseInstant(release)
+  return instant !== null && now < instant
 }

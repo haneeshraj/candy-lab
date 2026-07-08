@@ -37,6 +37,7 @@ function initialForm(release: Release | null): {
   platformLinks: Record<string, string>
   visualLink: string
   masterLink: string
+  preSaveLink: string
   previewEnabled: boolean
 } {
   return {
@@ -49,6 +50,7 @@ function initialForm(release: Release | null): {
     platformLinks: release?.platformLinks ?? {},
     visualLink: release?.visualLink ?? '',
     masterLink: release?.masterLink ?? '',
+    preSaveLink: release?.preSaveLink ?? '',
     previewEnabled: release?.previewEnabled ?? false
   }
 }
@@ -110,6 +112,7 @@ function TrackCreateForm({
         platformLinks,
         visualLink: null,
         masterLink: masterLink.trim() || null,
+        preSaveLink: null,
         coverArtUrl: null,
         canvasUrl: null,
         previewEnabled: false,
@@ -371,6 +374,7 @@ function ReleaseForm({
         platformLinks: form.platformLinks,
         visualLink: form.visualLink.trim() || null,
         masterLink: form.masterLink.trim() || null,
+        preSaveLink: form.preSaveLink.trim() || null,
         coverArtUrl,
         canvasUrl: finalCanvasUrl,
         previewEnabled: form.previewEnabled,
@@ -485,6 +489,15 @@ function ReleaseForm({
         placeholder="https://…"
         value={form.masterLink}
         onChange={(event) => patch('masterLink', event.target.value)}
+      />
+
+      <TextField
+        label="Pre-save link"
+        type="url"
+        placeholder="https://…"
+        hint="Shown with a live countdown before the release date, in place of the platform links."
+        value={form.preSaveLink}
+        onChange={(event) => patch('preSaveLink', event.target.value)}
       />
 
       <div className={styles.grid}>

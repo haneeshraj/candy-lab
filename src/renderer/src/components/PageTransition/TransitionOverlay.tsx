@@ -40,7 +40,7 @@ const covered: Target = { clipPath: 'inset(0 0 0 0)' }
 const reveal: Target = { clipPath: 'inset(100% 0 0 0)' }
 
 const overlayTransition: Transition = {
-  duration: 1,
+  duration: 0.5,
   ease: [0.65, 0, 0, 1]
 }
 

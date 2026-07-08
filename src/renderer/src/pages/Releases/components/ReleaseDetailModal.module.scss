@@ -237,6 +237,65 @@
   }
 }
 
+// ── Pre-release countdown + pre-save link ─────────────────────────────────────
+// Shown in place of the platform links while the release date is still ahead.
+.preSave {
+  display: flex;
+  flex-direction: column;
+  gap: space(3);
+  margin-top: space(2);
+}
+
+.countdown {
+  display: flex;
+  gap: space(2);
+}
+
+.countUnit {
+  @include flex(column, center, center, rem(2px));
+
+  min-width: rem(52px);
+  padding: space(2) space(1);
+  background-color: rgb(255 255 255 / 12%);
+  border: $border-width solid rgb(255 255 255 / 20%);
+  border-radius: $radius-md;
+}
+
+.countValue {
+  font-size: $font-size-xl;
+  font-weight: $font-weight-semibold;
+  font-variant-numeric: tabular-nums;
+  line-height: $line-height-tight;
+  color: rgb(255 255 255);
+}
+
+.countLabel {
+  font-size: rem(10px);
+  text-transform: uppercase;
+  letter-spacing: rem(0.5px);
+  color: rgb(255 255 255 / 60%);
+}
+
+.preSaveButton {
+  align-self: flex-start;
+  padding: space(2) space(5);
+  font-size: $font-size-sm;
+  font-weight: $font-weight-semibold;
+
+  // Dark ink on the gold fill, readable in both themes (same trick as the
+  // primary Button variant).
+  color: $background;
+  cursor: pointer;
+  background-color: $primary;
+  border: $border-width solid transparent;
+  border-radius: $radius-pill;
+  transition: $transition-colors;
+
+  @include hover {
+    background-color: $primary-dark;
+  }
+}
+
 // ── Album/EP tracklist (right column) ─────────────────────────────────────────
 // Unlike the stage, this column sits on the themed `$surface`, so it uses the
 // regular theme tokens (readable in both light and dark) rather than the fixed

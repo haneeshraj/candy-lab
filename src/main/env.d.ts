@@ -11,6 +11,8 @@ declare global {
     readonly MAIN_VITE_SUPABASE_URL?: string
     readonly MAIN_VITE_SUPABASE_KEY?: string
     readonly MAIN_VITE_SUPABASE_ANON_KEY?: string
+    readonly MAIN_VITE_TONEDEN_CLIENT_ID?: string
+    readonly MAIN_VITE_TONEDEN_CLIENT_SECRET?: string
   }
 }
 

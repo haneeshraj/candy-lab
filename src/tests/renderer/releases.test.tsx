@@ -18,6 +18,7 @@ function makeRelease(overrides: Partial<Release> = {}): Release {
     platformLinks: {},
     visualLink: null,
     masterLink: null,
+    preSaveLink: null,
     coverArtUrl: null,
     canvasUrl: null,
     previewEnabled: false,
@@ -178,5 +179,63 @@ describe('ReleaseDetailModal — album/EP two-column layout', () => {
 
     expect(screen.queryByText('Tracks')).not.toBeInTheDocument()
     expect(tracksFn).not.toHaveBeenCalled()
+  })
+})
+
+describe('ReleaseDetailModal — pre-save countdown', () => {
+  beforeEach(() => stubApi())
+
+  function renderDetail(release: Release): void {
+    render(
+      <ReleaseDetailModal
+        release={release}
+        onClose={vi.fn()}
+        onEdit={vi.fn()}
+        onDelete={vi.fn()}
+        onOpenTrack={vi.fn()}
+      />
+    )
+  }
+
+  it('before the release date: shows the countdown + pre-save link and hides platform links', () => {
+    renderDetail(
+      makeRelease({
+        releaseDate: '2999-12-31',
+        platformLinks: { Spotify: 'https://open.spotify.com/x' },
+        preSaveLink: 'https://presave.example/x'
+      })
+    )
+
+    expect(screen.getByRole('timer', { name: /time until release/i })).toBeInTheDocument()
+    expect(screen.getByRole('button', { name: /pre-save/i })).toBeInTheDocument()
+    // The streaming link is hidden even though it exists on the release.
+    expect(screen.queryByRole('button', { name: 'Spotify' })).not.toBeInTheDocument()
+  })
+
+  it('on/after the release date: shows platform links and no countdown', () => {
+    renderDetail(
+      makeRelease({
+        releaseDate: '2000-01-01',
+        platformLinks: { Spotify: 'https://open.spotify.com/x' },
+        preSaveLink: 'https://presave.example/x'
+      })
+    )
+
+    expect(screen.getByRole('button', { name: 'Spotify' })).toBeInTheDocument()
+    expect(screen.queryByRole('timer')).not.toBeInTheDocument()
+    expect(screen.queryByRole('button', { name: /pre-save/i })).not.toBeInTheDocument()
+  })
+
+  it('opens the pre-save link externally when clicked', async () => {
+    const openExternal = vi.fn()
+    ;(window as unknown as { api: { system: { openExternal: unknown } } }).api.system.openExternal =
+      openExternal
+
+    renderDetail(
+      makeRelease({ releaseDate: '2999-12-31', preSaveLink: 'https://presave.example/x' })
+    )
+
+    await userEvent.click(screen.getByRole('button', { name: /pre-save/i }))
+    expect(openExternal).toHaveBeenCalledWith('https://presave.example/x')
   })
 })

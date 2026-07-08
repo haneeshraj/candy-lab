@@ -28,6 +28,11 @@ create table if not exists public.releases (
   platform_links  jsonb not null default '{}',
   visual_link     text,
   master_link     text,
+  -- Optional pre-save / countdown link. Shown (with a live countdown) on the
+  -- public page while now < release_date; hidden once release_date arrives, when
+  -- the platform_links become visible instead. The pre/post state is derived
+  -- from release_date at read time, never stored. See migrations/005_pre_save.sql.
+  pre_save_link   text,
   cover_art_url   text,
   canvas_url      text,
   preview_enabled boolean not null default false,

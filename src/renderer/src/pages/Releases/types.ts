@@ -20,6 +20,11 @@ export interface Release {
   platformLinks: Record<string, string>
   visualLink: string | null
   masterLink: string | null
+  /** Optional pre-save / countdown link. Shown (with a live countdown) while the
+   * current time is before `releaseDate`, in place of the streaming
+   * `platformLinks`; hidden once `releaseDate` passes. Derived, never stored —
+   * see `isPreRelease` in `./utils`. */
+  preSaveLink: string | null
   coverArtUrl: string | null
   canvasUrl: string | null
   previewEnabled: boolean
@@ -46,6 +51,8 @@ export interface ReleaseInput {
   platformLinks: Record<string, string>
   visualLink: string | null
   masterLink: string | null
+  /** Optional pre-save / countdown link, shown before `releaseDate` (see `Release`). */
+  preSaveLink: string | null
   coverArtUrl: string | null
   canvasUrl: string | null
   previewEnabled: boolean

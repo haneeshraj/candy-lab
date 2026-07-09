@@ -23,8 +23,9 @@ function formatDate(iso: string): string {
 }
 
 /**
- * Contents of the "Release Notes" modal. Fetches the latest published GitHub
- * release on open and renders its version, date, and Markdown notes.
+ * Contents of the "Release Notes" modal. Fetches the GitHub release for the
+ * currently installed version on open and renders its version, date, and
+ * Markdown notes.
  */
 export function ReleaseNotesContent(): React.JSX.Element {
   const [state, setState] = useState<State>({ status: 'loading' })
@@ -32,7 +33,7 @@ export function ReleaseNotesContent(): React.JSX.Element {
   useEffect(() => {
     let cancelled = false
     window.api.updater
-      .getLatestRelease()
+      .getCurrentRelease()
       .then((release) => {
         if (!cancelled) setState({ status: 'ready', release })
       })
@@ -45,7 +46,7 @@ export function ReleaseNotesContent(): React.JSX.Element {
   }, [])
 
   if (state.status === 'loading') {
-    return <p className={styles.muted}>Loading latest release…</p>
+    return <p className={styles.muted}>Loading release notes…</p>
   }
 
   if (state.status === 'error' || !state.release) {

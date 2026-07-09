@@ -44,7 +44,7 @@ export function quitAndInstall(): void {
   autoUpdater.quitAndInstall()
 }
 
-// Minimal shape of the GitHub "latest release" response we consume.
+// Minimal shape of the GitHub release response we consume.
 interface GithubReleaseResponse {
   tag_name?: string
   name?: string | null
@@ -54,23 +54,28 @@ interface GithubReleaseResponse {
 }
 
 /**
- * Fetch the latest published release from GitHub for the "Release Notes" dialog.
- * Public repositories do not need an auth token. Returns `null` if the request
- * fails (offline, no releases yet, or GitHub returns a non-OK status).
+ * Fetch the release notes for the *currently running* version (not the newest
+ * release) for the "Release Notes" dialog — a user should see what shipped in
+ * the build they have installed. Looks up the release by its `v{version}` tag,
+ * matching the tag electron-builder publishes. Public repositories do not need
+ * an auth token. Returns `null` if the request fails (offline, no matching
+ * release — e.g. an unpublished dev version — or a non-OK status).
  */
-export async function getLatestRelease(): Promise<ReleaseInfo | null> {
+export async function getCurrentRelease(): Promise<ReleaseInfo | null> {
   const headers: Record<string, string> = {
     Accept: 'application/vnd.github+json',
     'User-Agent': 'candy-lab'
   }
 
+  const tag = `v${app.getVersion()}`
+
   try {
     const res = await fetch(
-      `https://api.github.com/repos/${GITHUB_OWNER}/${GITHUB_REPO}/releases/latest`,
+      `https://api.github.com/repos/${GITHUB_OWNER}/${GITHUB_REPO}/releases/tags/${tag}`,
       { headers }
     )
     if (!res.ok) {
-      logger.warn(`Fetch latest release failed: HTTP ${res.status}`)
+      logger.warn(`Fetch release for ${tag} failed: HTTP ${res.status}`)
       return null
     }
     const data = (await res.json()) as GithubReleaseResponse
@@ -82,7 +87,7 @@ export async function getLatestRelease(): Promise<ReleaseInfo | null> {
       publishedAt: data.published_at ?? ''
     }
   } catch (error) {
-    logger.error('Fetch latest release errored', error)
+    logger.error('Fetch current release errored', error)
     return null
   }
 }

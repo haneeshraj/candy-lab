@@ -88,8 +88,8 @@ export interface UpdaterApi {
   getStatus: () => Promise<UpdaterStatus>
   /** Subscribe to status changes; returns an unsubscribe function. */
   onStatusChange: (callback: (status: UpdaterStatus) => void) => () => void
-  /** Fetch the latest published release from GitHub (`null` if unavailable). */
-  getLatestRelease: () => Promise<ReleaseInfo | null>
+  /** Fetch the release notes for the running version (`null` if unavailable). */
+  getCurrentRelease: () => Promise<ReleaseInfo | null>
 }
 
 // ── Releases (music catalog CMS) ─────────────────────────────────────────────

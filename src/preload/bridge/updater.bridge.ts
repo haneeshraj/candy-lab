@@ -10,5 +10,5 @@ export const updaterBridge: UpdaterApi = {
   getStatus: () => invoke<UpdaterStatus>(IPC_CHANNELS.UPDATER_GET_STATUS),
   onStatusChange: (callback) =>
     on(IPC_CHANNELS.UPDATER_STATUS_CHANGED, (payload) => callback(payload as UpdaterStatus)),
-  getLatestRelease: () => invoke<ReleaseInfo | null>(IPC_CHANNELS.UPDATER_GET_LATEST_RELEASE)
+  getCurrentRelease: () => invoke<ReleaseInfo | null>(IPC_CHANNELS.UPDATER_GET_CURRENT_RELEASE)
 }

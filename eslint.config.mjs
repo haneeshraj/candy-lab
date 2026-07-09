@@ -68,5 +68,13 @@ export default defineConfig(
       'react-hooks/rules-of-hooks': 'off'
     }
   },
+  // Build/tooling scripts are plain Node ESM, not typed app source — TS-only
+  // rules like explicit return types don't apply (and can't be expressed in .mjs).
+  {
+    files: ['scripts/**/*.{js,mjs,cjs}'],
+    rules: {
+      '@typescript-eslint/explicit-function-return-type': 'off'
+    }
+  },
   eslintConfigPrettier
 )
